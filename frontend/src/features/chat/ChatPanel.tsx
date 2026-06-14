@@ -22,6 +22,8 @@ import type { Capabilities, ChatResponse, MapAction } from '../../api/types';
 
 interface ChatPanelProps {
   open: boolean;
+  /** Increment to pull focus to the prompt box (e.g. from the "Ask Property AI" button). */
+  focusSignal?: number;
   onClose: () => void;
   onApply: (action: MapAction) => void;
   onNotify: (title: string, detail?: string, kind?: 'info' | 'success' | 'warning') => void;
@@ -33,7 +35,7 @@ interface Message {
   response?: ChatResponse;
 }
 
-export function ChatPanel({ open, onClose, onApply, onNotify }: ChatPanelProps) {
+export function ChatPanel({ open, focusSignal = 0, onClose, onApply, onNotify }: ChatPanelProps) {
   const [capabilities, setCapabilities] = useState<Capabilities | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -41,15 +43,53 @@ export function ChatPanel({ open, onClose, onApply, onNotify }: ChatPanelProps) 
   const [status, setStatus] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [waking, setWaking] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const promptRef = useRef<HTMLFormElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  // Free-tier hosting spins the API down after idle. Retry the capabilities probe
+  // (which also warms the server) and surface a "Waking the server…" state after 3 s
+  // so a cold start recovers unaided instead of silently disabling the assistant.
   useEffect(() => {
-    fetchCapabilities().then(setCapabilities).catch(() => setCapabilities(null));
-    return () => abortRef.current?.abort();
+    let cancelled = false;
+    const wakeTimer = setTimeout(() => { if (!cancelled) setWaking(true); }, 3000);
+    void (async () => {
+      for (let attempt = 0; attempt < 15 && !cancelled; attempt += 1) {
+        try {
+          const caps = await fetchCapabilities();
+          if (cancelled) return;
+          setCapabilities(caps);
+          setWaking(false);
+          clearTimeout(wakeTimer);
+          return;
+        } catch {
+          if (cancelled) return;
+          await new Promise((resolve) => setTimeout(resolve, 2500));
+        }
+      }
+      if (!cancelled) { setCapabilities(null); setWaking(false); }
+    })();
+    return () => { cancelled = true; clearTimeout(wakeTimer); abortRef.current?.abort(); };
   }, []);
   useEffect(() => {
     if (messages.length > 0 || status) bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, status]);
+  // "Ask Property AI" bumps focusSignal: bring the prompt into view, focus it, and
+  // flash a highlight so it's obvious where to type even when the panel was already open.
+  useEffect(() => {
+    if (!focusSignal) return;
+    const prompt = promptRef.current;
+    prompt?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    textareaRef.current?.focus();
+    if (prompt) {
+      prompt.classList.remove('flash');
+      void prompt.offsetWidth; // restart the animation if it's still running from a prior click
+      prompt.classList.add('flash');
+    }
+    const timer = setTimeout(() => prompt?.classList.remove('flash'), 1200);
+    return () => clearTimeout(timer);
+  }, [focusSignal]);
 
   const sendPrompt = async (content: string) => {
     if (!content || busy || !capabilities?.chat) return;
@@ -92,9 +132,10 @@ export function ChatPanel({ open, onClose, onApply, onNotify }: ChatPanelProps) 
         <button className="icon-button quiet" type="button" title="Close copilot" onClick={onClose}><X size={18} /></button>
       </header>
       <div className="chat-scroll">
-        <form className="copilot-prompt" onSubmit={submit}>
+        <form ref={promptRef} className="copilot-prompt" onSubmit={submit}>
           <span>Ask anything about the market</span>
           <textarea
+            ref={textareaRef}
             aria-label="Ask the property assistant"
             maxLength={500}
             rows={3}
@@ -149,6 +190,7 @@ export function ChatPanel({ open, onClose, onApply, onNotify }: ChatPanelProps) 
           ))}
           {busy && <div className="message assistant pending">{status}</div>}
           {error && <p className="error-copy">{error}</p>}
+          {waking && !capabilities && <p className="muted">Waking the server… free hosting takes a moment after a quiet spell.</p>}
           {!capabilities?.chat && capabilities && <p className="muted">Assistant unavailable in this environment.</p>}
           <div ref={bottomRef} />
         </div>

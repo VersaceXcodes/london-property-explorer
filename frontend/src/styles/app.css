@@ -177,7 +177,7 @@ button { color: inherit; }
   min-width: 0;
   height: 46px;
   display: grid;
-  grid-template-columns: 22px auto minmax(0, 1fr);
+  grid-template-columns: 22px minmax(0, 1fr);
   align-items: center;
   gap: 12px;
   border: 1px solid #d8e3f5;
@@ -198,7 +198,7 @@ button { color: inherit; }
 
 .toolbar-search input::placeholder { color: #6d7a98; }
 .mobile-product-name {
-  display: block;
+  display: none;
   color: #0d1b3d;
   font-size: 12px;
   font-weight: 850;
@@ -1582,6 +1582,20 @@ legend {
 .copilot-prompt {
   border-color: #c9b6ff;
   box-shadow: 0 0 0 3px rgb(124 60 255 / 7%);
+  scroll-margin-top: 12px;
+}
+
+.copilot-prompt.flash {
+  animation: copilot-prompt-flash 1.2s ease-out;
+}
+
+@keyframes copilot-prompt-flash {
+  0%, 70% { border-color: #7c3cff; box-shadow: 0 0 0 4px rgb(124 60 255 / 28%); }
+  100% { border-color: #c9b6ff; box-shadow: 0 0 0 3px rgb(124 60 255 / 7%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .copilot-prompt.flash { animation: none; }
 }
 
 .copilot-prompt span {
@@ -1921,6 +1935,7 @@ legend {
 
 @media (max-width: 1280px) {
   .topbar { grid-template-columns: minmax(280px, 390px) minmax(0, 1fr); }
+  .hide-md,
   .more-filters { display: none; }
   .hero-image {
     width: 50%;
@@ -1934,7 +1949,8 @@ legend {
   .workspace { grid-template-columns: 1fr; }
   .chat-panel { grid-column: 1; max-height: none; }
   .insight-grid { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
-  .hide-md { display: none; }
+  .topbar { grid-template-columns: minmax(220px, 300px) minmax(0, 1fr); }
+  .date-pill { display: none; }
   .hero-header { min-height: 0; }
   .hero-copy { padding-right: min(30vw, 300px); }
   .hero-image {
@@ -1957,6 +1973,7 @@ legend {
   .toolbar-search svg,
   .toolbar-search input { display: none; }
   .mobile-product-name {
+    display: block;
     overflow: hidden;
     font-size: 13px;
     text-overflow: ellipsis;
@@ -2039,9 +2056,15 @@ legend {
     background: #f6f9ff;
     transform: translateX(-104%);
     transition: transform 180ms ease;
+    visibility: hidden;
+    pointer-events: none;
     box-shadow: 22px 0 54px rgb(15 34 75 / 18%);
   }
-  .control-rail.open { transform: translateX(0); }
+  .control-rail.open {
+    transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
+  }
   .map-column { grid-template-rows: minmax(520px, 62vh) auto; }
   .map-stage { min-height: 520px; }
   .map-mode-badge { left: 14px; top: 58px; }

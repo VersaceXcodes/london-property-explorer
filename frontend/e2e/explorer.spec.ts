@@ -54,6 +54,7 @@ test.beforeEach(async ({ page }) => {
 
 test('toolbar and filter controls drive live transaction query params', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === 'mobile', 'desktop toolbar menus are intentionally collapsed on mobile');
+  await page.setViewportSize({ width: 1728, height: 972 });
   await page.goto('/');
   await page.getByRole('button', { name: /1 Apr 2024/ }).click();
   await page.getByRole('dialog', { name: 'date menu' }).getByRole('button', { name: 'All available dates' }).click();
@@ -70,7 +71,7 @@ test('toolbar and filter controls drive live transaction query params', async ({
 
 test('reviewer can stream an answer and apply a map proposal', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByText('London Property Explorer')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Find property opportunities across London' })).toBeVisible();
   expect(districtRequests).toBe(0);
   await page.getByRole('button', { name: 'Assistant' }).click();
   await page.getByLabel('Ask the property assistant').fill('Show SW11 sales');

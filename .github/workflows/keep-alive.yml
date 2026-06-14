@@ -1,0 +1,30 @@
+name: Keep API Warm
+
+# Render's free web service spins the API down after ~15 min idle, which makes a
+# cold first request (e.g. /api/capabilities) look like the assistant is broken.
+# This pinger keeps it warm. Note: GitHub's scheduler can be delayed by a few
+# minutes, so the frontend also handles cold starts gracefully as a backstop.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/10 * * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: keep-alive
+  cancel-in-progress: true
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping /api/health
+        env:
+          # Override with a repo variable if the API URL changes.
+          API_URL: ${{ vars.KEEPALIVE_API_URL || 'https://lpe-api-e7n7.onrender.com' }}
+        run: |
+          curl --fail --show-error --silent \
+            --retry 3 --retry-all-errors --retry-delay 15 --max-time 120 \
+            "${API_URL}/api/health"
