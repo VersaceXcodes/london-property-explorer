@@ -1,0 +1,556 @@
+{
+  "project": "London Property Explorer",
+  "version": "1.0.0",
+  "updated_at": "2026-06-14",
+  "status_values": [
+    "pending",
+    "in_progress",
+    "blocked",
+    "completed"
+  ],
+  "current_milestone": "M4",
+  "completion_definition": "M0 through M6 are complete, all acceptance criteria pass, and evidence contains real command or deployment results.",
+  "global_rules": [
+    "Respect task dependencies.",
+    "Only one task may be in_progress at a time.",
+    "Never mark a task complete without validation evidence.",
+    "Update progress.md whenever task state changes.",
+    "Never commit source CSVs, secrets, or invented measurements."
+  ],
+  "milestones": [
+    {
+      "id": "M0",
+      "title": "Governance and tooling",
+      "required": true,
+      "tasks": [
+        {
+          "id": "M0-T1",
+          "title": "Create repository governance",
+          "status": "completed",
+          "priority": "P0",
+          "depends_on": [],
+          "intent": "Make project state and implementation rules discoverable to humans and coding agents.",
+          "implementation": [
+            "Create AGENTS.md, agent.md, progress.md, tasks.json, .gitignore, and .env.example."
+          ],
+          "acceptance_criteria": [
+            "Files exist at repository root.",
+            "Progress distinguishes evidence from planned work.",
+            "Tasks include dependencies, validation, and evidence fields."
+          ],
+          "validation_commands": [
+            "python -m json.tool tasks.json >/dev/null",
+            "test -f AGENTS.md -a -f agent.md -a -f progress.md"
+          ],
+          "evidence": [
+            "Created during the 2026-06-13 implementation session."
+          ],
+          "files": [
+            "AGENTS.md",
+            "agent.md",
+            "progress.md",
+            "tasks.json"
+          ],
+          "notes": "AGENTS.md is authoritative for auto-discovered agent instructions."
+        },
+        {
+          "id": "M0-T2",
+          "title": "Configure Python, TypeScript, and CI tooling",
+          "status": "completed",
+          "priority": "P0",
+          "depends_on": [
+            "M0-T1"
+          ],
+          "intent": "Provide deterministic install, lint, type-check, test, and build commands.",
+          "implementation": [
+            "Create Python and frontend manifests.",
+            "Add GitHub Actions deterministic checks."
+          ],
+          "acceptance_criteria": [
+            "Python package metadata validates.",
+            "Frontend dependencies install.",
+            "CI workflow references repository commands."
+          ],
+          "validation_commands": [
+            "python -m compileall api pipeline",
+            "npm --prefix frontend run build"
+          ],
+          "evidence": [
+            "Python editable install completed.",
+            "Frontend npm install and production build completed on Node 22.16.",
+            "PR and protected live workflows created."
+          ],
+          "files": [
+            "pyproject.toml",
+            "frontend/package.json",
+            ".github/workflows/ci.yml"
+          ],
+          "notes": "Live-provider tests remain separate from pull-request CI."
+        }
+      ]
+    },
+    {
+      "id": "M1",
+      "title": "Pipeline and PostGIS",
+      "required": true,
+      "tasks": [
+        {
+          "id": "M1-T1",
+          "title": "Implement streaming source transform",
+          "status": "completed",
+          "priority": "P0",
+          "depends_on": [
+            "M0-T2"
+          ],
+          "intent": "Produce a deterministic, validated load CSV without loading multi-GB inputs into memory.",
+          "implementation": [
+            "Index only required ONSPD fields by canonical postcode.",
+            "Stream and filter PPD rows.",
+            "Emit manifest and validation report."
+          ],
+          "acceptance_criteria": [
+            "Matching hashes produce 466368 final rows.",
+            "Join coverage is at least 99.9 percent.",
+            "All documented abort gates are enforced."
+          ],
+          "validation_commands": [
+            "pytest pipeline/tests -q",
+            "python -m pipeline.lpe_pipeline.cli --help",
+            ".venv/bin/python scripts/build_local_sqlite.py --ppd /Users/moel/Downloads/pp-complete.csv --onspd /Users/moel/Downloads/ONSPD_Online_Latest_Centroids_-966716609290186519.csv --out data/local/lpe-local.sqlite3 --force"
+          ],
+          "evidence": [
+            "Streaming implementation and focused tests pass.",
+            "Prior source analysis recorded the exact 466368-row expected snapshot.",
+            "Exact checkpoints now require both validated source hashes; global ONSPD duplicate detection is disk-backed and memory-bounded.",
+            "Manifest and validation output include source/final date ranges and publish only after every staged artifact passes.",
+            "Full rebuild with the new implementation awaits district boundary input.",
+            "2026-06-13: scripts/build_local_sqlite.py streamed /Users/moel/Downloads/pp-complete.csv and ONSPD_Online_Latest_Centroids_-966716609290186519.csv through the same source gates and built data/local/lpe-local.sqlite3 with 466,368 rows, 2021-01-01 to 2026-04-30, and 279 postcode districts."
+          ],
+          "files": [
+            "pipeline/lpe_pipeline",
+            "pipeline/tests"
+          ],
+          "notes": "ONSPD postcode lookup fits memory; PPD must remain fully streamed."
+        },
+        {
+          "id": "M1-T2",
+          "title": "Create PostGIS schema and loader",
+          "status": "completed",
+          "priority": "P0",
+          "depends_on": [
+            "M1-T1"
+          ],
+          "intent": "Create the canonical read-only spatial database and fast bulk load path.",
+          "implementation": [
+            "Create DDL and grants.",
+            "Load transactions, districts, metadata, and precomputed low-zoom clusters.",
+            "Refresh materialized view and analyze."
+          ],
+          "acceptance_criteria": [
+            "DDL matches database requirements.",
+            "Relation size gate is enforced.",
+            "Canonical queries execute against fixture PostGIS."
+          ],
+          "validation_commands": [
+            ".venv/bin/ruff format --check scripts/load_database.py api/app/db/queries.py api/app/db/repository.py api/app/db/sqlite_repository.py api/app/services/data.py api/tests/test_sqlite_repository.py",
+            ".venv/bin/ruff check scripts/load_database.py api/app/db/queries.py api/app/db/repository.py api/app/db/sqlite_repository.py api/app/services/data.py api/tests/test_sqlite_repository.py",
+            ".venv/bin/mypy scripts/load_database.py api/app/db/repository.py api/app/db/sqlite_repository.py api/app/services/data.py",
+            ".venv/bin/pytest api/tests/test_api.py api/tests/test_sqlite_repository.py -q",
+            "DATABASE_URL=\"$SUPABASE_ADMIN_DATABASE_URL\" .venv/bin/python scripts/load_database.py pipeline/output"
+          ],
+          "evidence": [
+            "DDL and remote-safe client-side loader implemented and statically verified.",
+            "Schema, app_reader password, bulk copy, row count, analyze, and predicted size gate execute in one rollback-safe transaction.",
+            "2026-06-14: pipeline/output generated from the validated local PPD/ONSPD files plus uk-postcode-polygons: transactions.csv 58 MB, districts.geojson 329,301 bytes, validation-report valid=true, final_rows=466,368, district_count=279, join_coverage=0.999993567725419.",
+            "2026-06-14: Supabase load via session pooler completed with 466,368 transactions, 279 districts, 279 district_stats rows, 992 cluster_cells rows, 1 dataset_meta row, relation_bytes=136,470,528, database_bytes=155,913,363.",
+            "2026-06-14: app_reader API smoke against Supabase returned health 200, meta total 466,368/date range 2021-01-01..2026-04-30, clusters_z11 701 cells, binary points 25,000 rows with X-Truncated=true, 279 district stats rows, districts GeoJSON 329,301 bytes, and SW11 4NB history count 4."
+          ],
+          "files": [
+            "pipeline/schema.sql",
+            "scripts/load_database.py",
+            "scripts/load_database.sh",
+            "api/app/db/queries.py",
+            "api/app/db/repository.py",
+            "api/app/db/pool.py"
+          ],
+          "notes": "Direct Supabase host was IPv6-only from this environment, so local validation used the Supabase session pooler with asyncpg statement caching disabled."
+        }
+      ]
+    },
+    {
+      "id": "M2",
+      "title": "FastAPI service",
+      "required": true,
+      "tasks": [
+        {
+          "id": "M2-T1",
+          "title": "Implement API foundation and data endpoints",
+          "status": "completed",
+          "priority": "P0",
+          "depends_on": [
+            "M1-T2"
+          ],
+          "intent": "Serve the documented public read contract from PostGIS.",
+          "implementation": [
+            "Create settings, lifecycle, pool, errors, middleware, repositories, services, and routes.",
+            "Implement all core endpoints and capability flags."
+          ],
+          "acceptance_criteria": [
+            "OpenAPI routes return schema-valid fixtures.",
+            "Errors use the common envelope.",
+            "CORS and cache policies match the specification."
+          ],
+          "validation_commands": [
+            "pytest api/tests -q"
+          ],
+          "evidence": [
+            "FastAPI routes pass fixture-backed contract tests.",
+            "Generated docs/openapi.yaml now comes from the running FastAPI schema.",
+            "2026-06-13: Local FastAPI served real-data /api/meta, /api/transactions clusters, /api/postcode/SW11%204NB/history, and /api/district-stats from data/local/lpe-local.sqlite3.",
+            "2026-06-13: /api/transactions request logging now records mode and count; chat/stream/feedback now set no-store."
+          ],
+          "files": [
+            "api/app",
+            "api/tests"
+          ],
+          "notes": "Tests use dependency overrides and a fake repository where PostGIS is unavailable."
+        },
+        {
+          "id": "M2-T2",
+          "title": "Implement LPE1 binary transport",
+          "status": "completed",
+          "priority": "P0",
+          "depends_on": [
+            "M2-T1"
+          ],
+          "intent": "Provide bounded low-overhead point transport synchronized with schema.js.",
+          "implementation": [
+            "Implement little-endian encoder.",
+            "Add cross-language golden fixtures."
+          ],
+          "acceptance_criteria": [
+            "Exact 8+23N layout.",
+            "Invalid postcodes, dates, and types fail closed.",
+            "JSON and binary select identical ordered rows."
+          ],
+          "validation_commands": [
+            "pytest api/tests/test_binary.py -q",
+            "npm --prefix frontend test -- --run"
+          ],
+          "evidence": [
+            "Python binary tests and JavaScript decoder golden test pass.",
+            "Wire size remains exactly 8+23N.",
+            "2026-06-13: Real-data binary GET returned 200 application/octet-stream, LPE1 magic, 25,000 rows, 575,008 bytes, and X-Truncated: true."
+          ],
+          "files": [
+            "api/app/services/binary.py",
+            "api/tests/test_binary.py",
+            "schema.js"
+          ],
+          "notes": "Do not change LPE1 without a version bump."
+        }
+      ]
+    },
+    {
+      "id": "M3",
+      "title": "React geospatial product",
+      "required": true,
+      "tasks": [
+        {
+          "id": "M3-T1",
+          "title": "Implement map data loop and layers",
+          "status": "completed",
+          "priority": "P0",
+          "depends_on": [
+            "M2-T2"
+          ],
+          "intent": "Render clusters, points, and districts from viewport-bounded data without blocking interaction.",
+          "implementation": [
+            "Create app shell and map overlay.",
+            "Implement fetch cancellation, debounce, cache, binary worker, and layers."
+          ],
+          "acceptance_criteria": [
+            "Zoom 11 and 12 switch modes correctly.",
+            "Truncated responses are never containment-reused.",
+            "Map remains interactive during requests."
+          ],
+          "validation_commands": [
+            "npm --prefix frontend test -- --run",
+            "npm --prefix frontend run build"
+          ],
+          "evidence": [
+            "Vitest cache/truncation tests pass.",
+            "Production frontend build passes and binary worker emits typed deck.gl attributes.",
+            "District data is lazy-loaded on first use and cluster labels render from aggregate counts.",
+            "2026-06-13: In-app browser against local real data showed header 466,368 sales, clusters status 309,289 sales loaded, and point-mode status Transactions \u00b7 25,000+ loaded \u2014 zoom in."
+          ],
+          "files": [
+            "frontend/src/map",
+            "frontend/src/workers",
+            "frontend/src/api"
+          ],
+          "notes": "The map is the first screen, not a landing page."
+        },
+        {
+          "id": "M3-T2",
+          "title": "Implement product interactions and responsive UI",
+          "status": "completed",
+          "priority": "P0",
+          "depends_on": [
+            "M3-T1"
+          ],
+          "intent": "Complete filters, legends, property history, errors, accessibility, and mobile behavior.",
+          "implementation": [
+            "Build controls and status surfaces.",
+            "Build card, sparkline, choropleth, and mobile layouts."
+          ],
+          "acceptance_criteria": [
+            "Reviewer journey passes.",
+            "375px layout has no overlap.",
+            "Truncation and centroid limitations remain visible."
+          ],
+          "validation_commands": [
+            "npm --prefix frontend run e2e"
+          ],
+          "evidence": [
+            "Four Playwright journeys pass across desktop and mobile projects.",
+            "Desktop and 390x844 layouts visually inspected in the in-app browser.",
+            "Playwright verifies no eager district request and that Apply/Undo restores the previous layer mode.",
+            "2026-06-13: Added London maxBounds, initial zoom 11, detailed point hover content, Esc close for history, explicit stream-event validation through schema.js, and fixed package engines metadata."
+          ],
+          "files": [
+            "frontend/src/components",
+            "frontend/src/styles",
+            "frontend/e2e"
+          ],
+          "notes": "Use familiar icon buttons with tooltips where appropriate."
+        }
+      ]
+    },
+    {
+      "id": "M4",
+      "title": "Performance and deployment",
+      "required": true,
+      "tasks": [
+        {
+          "id": "M4-T1",
+          "title": "Measure and optimize",
+          "status": "pending",
+          "priority": "P0",
+          "depends_on": [
+            "M3-T2"
+          ],
+          "intent": "Meet documented budgets with measured evidence rather than estimates.",
+          "implementation": [
+            "Run SQL, payload, decode, render, and interaction protocols.",
+            "Optimize only failed budgets."
+          ],
+          "acceptance_criteria": [
+            "Performance table contains five-run medians.",
+            "Hard ceilings pass or deviation is explicitly approved."
+          ],
+          "validation_commands": [
+            "scripts/measure.sh"
+          ],
+          "evidence": [
+            "Production bundle currently measures 564 KB gzip for the main JavaScript chunk.",
+            "Database, endpoint, decode, and interaction measurements require the loaded full stack."
+          ],
+          "files": [
+            "README.md",
+            "scripts/measure.sh"
+          ],
+          "notes": "Cannot complete without running the full stack and real dataset."
+        },
+        {
+          "id": "M4-T2",
+          "title": "Deploy and verify durability",
+          "status": "pending",
+          "priority": "P0",
+          "depends_on": [
+            "M4-T1"
+          ],
+          "intent": "Publish a reproducible reviewer-ready application.",
+          "implementation": [
+            "Deploy Render services and Supabase schema.",
+            "Configure pinger and smoke checks."
+          ],
+          "acceptance_criteria": [
+            "Desktop and mobile smoke pass.",
+            "24-hour and 7-day checks are recorded.",
+            "Provider quotas are within gates."
+          ],
+          "validation_commands": [
+            "scripts/smoke.sh $API_BASE_URL"
+          ],
+          "evidence": [
+            "Render Blueprint and smoke script implemented.",
+            "No deployment URL, 24-hour check, or 7-day check exists yet."
+          ],
+          "files": [
+            "render.yaml",
+            "scripts/smoke.sh",
+            "README.md"
+          ],
+          "notes": "Requires external credentials and provider setup."
+        }
+      ]
+    },
+    {
+      "id": "M5",
+      "title": "Production agentic AI",
+      "required": true,
+      "tasks": [
+        {
+          "id": "M5-T1",
+          "title": "Implement Pinecone knowledge ingestion",
+          "status": "pending",
+          "priority": "P0",
+          "depends_on": [
+            "M4-T2"
+          ],
+          "intent": "Build a versioned evidence corpus for explanatory answers without embedding transactions.",
+          "implementation": [
+            "Fetch allowlisted official sources.",
+            "Chunk by headings and upsert deterministic records.",
+            "Produce corpus manifest."
+          ],
+          "acceptance_criteria": [
+            "Every chunk has complete provenance metadata.",
+            "Reindex uses a new namespace.",
+            "Retrieval recall@5 is at least 90 percent."
+          ],
+          "validation_commands": [
+            "pytest api/tests/test_retrieval_ingest.py -q",
+            "python -m api.app.ai.retrieval.ingest --help"
+          ],
+          "evidence": [
+            "Deterministic chunking tests pass and provenance metadata is implemented.",
+            "Live Pinecone namespace build and recall evaluation remain pending."
+          ],
+          "files": [
+            "knowledge/sources.yaml",
+            "api/app/ai/retrieval"
+          ],
+          "notes": "Starter indexes are AWS us-east-1; namespace promotion is an environment change."
+        },
+        {
+          "id": "M5-T2",
+          "title": "Implement typed LangGraph workflow",
+          "status": "pending",
+          "priority": "P0",
+          "depends_on": [
+            "M5-T1"
+          ],
+          "intent": "Route SQL, RAG, hybrid, map action, and unsupported requests through explicit bounded nodes.",
+          "implementation": [
+            "Define graph state and nodes.",
+            "Implement tools, citations, verification, retries, and degradation."
+          ],
+          "acceptance_criteria": [
+            "Numeric groundedness and citation validity are 100 percent.",
+            "Critical injection failures are zero.",
+            "Hard timeout and cost cap are enforced."
+          ],
+          "validation_commands": [
+            "pytest api/tests/test_ai.py -q"
+          ],
+          "evidence": [
+            "SQL and RAG graph tests pass with fake providers.",
+            "Grounding, redaction, route refusal, cost, and timeout paths are implemented.",
+            "2026-06-14: Added configurable model provider selection with Anthropic direct and OpenRouter gateways. OpenRouter uses the OpenAI-compatible LangChain adapter with server-side OPENROUTER_API_KEY, model, base URL, and optional attribution headers. Focused AI tests pass without live credentials.",
+            "2026-06-14: Hardened OpenRouter for live Anthropic routing with prompt JSON plus local Pydantic validation after provider-side structured output rejected a oneOf schema. Full backend ruff, mypy, and pytest pass.",
+            "2026-06-14: With a local OpenRouter key configured and Supabase active, POST /api/chat answered a SQL dataset-count question with 466,368 sales, route=sql, model=anthropic/claude-sonnet-4.5, grounding passed, latency_ms=7599, tokens=1090/126, estimated_cost_usd=0.00172."
+          ],
+          "files": [
+            "api/app/ai",
+            "api/app/core/config.py",
+            "api/tests/test_ai.py",
+            "api/tests/test_live_ai.py"
+          ],
+          "notes": "No hidden chain-of-thought is exposed; steps are execution facts."
+        },
+        {
+          "id": "M5-T3",
+          "title": "Add streaming, citations, feedback, traces, and eval gates",
+          "status": "pending",
+          "priority": "P0",
+          "depends_on": [
+            "M5-T2"
+          ],
+          "intent": "Make agent behavior inspectable, measurable, correctable, and regression-resistant.",
+          "implementation": [
+            "Add chat, SSE, and feedback endpoints.",
+            "Add LangSmith redacted tracing and versioned eval datasets.",
+            "Build Apply and Undo UI."
+          ],
+          "acceptance_criteria": [
+            "First SSE event p95 is below 1 second.",
+            "Task success is at least 90 percent.",
+            "Typical and p95 cost targets pass.",
+            "Reviewed negative feedback can become an eval case."
+          ],
+          "validation_commands": [
+            "pytest api/tests/test_ai.py -q",
+            "python -m api.app.ai.evaluation.run --allow-incomplete",
+            "npm --prefix frontend run e2e"
+          ],
+          "evidence": [
+            "Deterministic replay achieved 100% route accuracy, 100% unsupported refusal, and zero critical injection failures.",
+            "2026-06-14: POST /api/chat/stream emitted run_started, step_started, completed execution steps, and final for the same OpenRouter SQL smoke; final route=sql, answer count=466,368, latency_ms=3822, estimated_cost_usd=0.00172.",
+            "2026-06-14: Browser UI test submitted SQL, map-action, and unsupported prompts through the Copilot. SQL count returned 466,368 sales with visible grounding steps; Highlight SW11 produced a reversible map action and visible Undo; weather question refused cleanly; browser console errors were empty.",
+            "Live latency, cost, retrieval, and task-success gates remain intentionally incomplete."
+          ],
+          "files": [
+            "api/app/api/routes/ai.py",
+            "evals",
+            "frontend/src/features/chat"
+          ],
+          "notes": "LangSmith outage degrades tracing but must not break SQL/map features."
+        }
+      ]
+    },
+    {
+      "id": "M6",
+      "title": "Final release gate",
+      "required": true,
+      "tasks": [
+        {
+          "id": "M6-T1",
+          "title": "Run complete release verification",
+          "status": "pending",
+          "priority": "P0",
+          "depends_on": [
+            "M5-T3"
+          ],
+          "intent": "Prove all contracts, quality gates, quotas, and user journeys before completion.",
+          "implementation": [
+            "Run deterministic and live suites.",
+            "Record limitations and residual risks."
+          ],
+          "acceptance_criteria": [
+            "All required tasks contain evidence.",
+            "No critical regression remains.",
+            "README and progress ledger match deployed reality."
+          ],
+          "validation_commands": [
+            "ruff check api pipeline evals scripts",
+            "mypy api pipeline evals scripts",
+            "pytest",
+            "npm --prefix frontend run lint",
+            "npm --prefix frontend test",
+            "npm --prefix frontend run build",
+            "npm --prefix frontend run e2e"
+          ],
+          "evidence": [],
+          "files": [
+            "progress.md",
+            "README.md",
+            "tasks.json"
+          ],
+          "notes": "This is the only task that marks the project complete."
+        }
+      ]
+    }
+  ]
+}

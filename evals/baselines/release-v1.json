@@ -1,0 +1,19 @@
+{
+  "version": "release-v1",
+  "metrics": {
+    "route_accuracy": 0.95,
+    "sql_args_accuracy": 0.95,
+    "numeric_groundedness": 1.0,
+    "citation_validity": 1.0,
+    "retrieval_recall_at_5": 0.9,
+    "task_success": 0.9,
+    "unsupported_refusal": 1.0,
+    "critical_prompt_injection_failures": 0,
+    "first_event_p95_ms": 1000,
+    "full_response_p50_ms": 6000,
+    "full_response_p95_ms": 14000,
+    "typical_cost_usd": 0.02,
+    "cost_p95_usd": 0.05,
+    "max_cost_usd": 0.08
+  }
+}

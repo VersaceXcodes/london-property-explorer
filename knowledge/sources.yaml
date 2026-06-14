@@ -1,0 +1,44 @@
+corpus: london-property-explorer
+sources:
+  - id: hmlr-price-paid-guide
+    kind: url
+    location: https://www.gov.uk/guidance/about-the-price-paid-data
+    publisher: HM Land Registry
+    title: About the Price Paid Data
+    licence: Open Government Licence v3.0
+  - id: ons-postcode-directory
+    kind: url
+    location: https://www.ons.gov.uk/methodology/geography/geographicalproducts/postcodeproducts
+    publisher: Office for National Statistics
+    title: ONS Postcode Products
+    licence: Open Government Licence v3.0
+  - id: ons-postal-geography
+    kind: url
+    location: https://www.ons.gov.uk/methodology/geography/ukgeographies/postalgeography
+    publisher: Office for National Statistics
+    title: Postal Geographies
+    licence: Open Government Licence v3.0
+  - id: ons-geography-licences
+    kind: url
+    location: https://www.ons.gov.uk/methodology/geography/licences
+    publisher: Office for National Statistics
+    title: ONS Geography Licences and Attribution
+    licence: Open Government Licence v3.0
+  - id: project-source-profile
+    kind: file
+    location: docs/SOURCE_DATA_PROFILE.md
+    publisher: London Property Explorer
+    title: Source Data Profile
+    licence: Project documentation
+  - id: project-system-design
+    kind: file
+    location: docs/SYSTEM_DESIGN.md
+    publisher: London Property Explorer
+    title: System Design
+    licence: Project documentation
+  - id: project-ai-design
+    kind: file
+    location: docs/AGENTIC_AI.md
+    publisher: London Property Explorer
+    title: Agentic AI Design
+    licence: Project documentation
