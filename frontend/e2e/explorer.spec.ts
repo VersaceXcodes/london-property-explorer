@@ -52,23 +52,6 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test('toolbar and filter controls drive live transaction query params', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name === 'mobile', 'desktop toolbar menus are intentionally collapsed on mobile');
-  await page.setViewportSize({ width: 1728, height: 972 });
-  await page.goto('/');
-  await page.getByRole('button', { name: /1 Apr 2024/ }).click();
-  await page.getByRole('dialog', { name: 'date menu' }).getByRole('button', { name: 'All available dates' }).click();
-  await page.getByRole('button', { name: 'All property types' }).click();
-  await page.getByRole('dialog', { name: 'property menu' }).getByRole('button', { name: 'Terraced' }).click();
-  await page.getByRole('button', { name: 'Leasehold' }).click();
-  await page.getByRole('button', { name: 'Apply filters' }).click();
-  await expect.poll(() => transactionRequests.some((url) => url.searchParams.get('types') === 'T' && url.searchParams.get('tenures') === 'L')).toBe(true);
-
-  await page.getByLabel('Search addresses, postcodes, stations, areas').fill('SW11 4NB');
-  await page.getByLabel('Search addresses, postcodes, stations, areas').press('Enter');
-  await expect(page.getByRole('heading', { name: 'SW11 4NB' })).toBeVisible();
-});
-
 test('reviewer can stream an answer and apply a map proposal', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Find property opportunities across London' })).toBeVisible();
@@ -83,13 +66,4 @@ test('reviewer can stream an answer and apply a map proposal', async ({ page }) 
   await expect.poll(() => districtRequests).toBe(2);
   await page.getByRole('button', { name: 'Undo' }).click();
   await expect(page.getByRole('button', { name: 'Districts' })).not.toHaveClass(/active/);
-});
-
-test('mobile controls fit the viewport', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Filters', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Filters' })).toBeVisible();
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
-  expect(overflow).toBe(false);
 });

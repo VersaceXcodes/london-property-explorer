@@ -1,0 +1,376 @@
+- generic [ref=e3]:
+  - complementary "Primary navigation" [ref=e4]:
+    - generic "PropertyIQ" [ref=e5]:
+      - generic [ref=e6]: Property
+      - strong [ref=e7]: IQ
+      - emphasis [ref=e8]: HM Land Registry + ONS
+    - navigation [ref=e9]:
+      - button "Dashboard" [ref=e10] [cursor=pointer]:
+        - img [ref=e11]
+        - generic [ref=e14]: Dashboard
+      - button "Map" [ref=e15] [cursor=pointer]:
+        - img [ref=e16]
+        - generic [ref=e18]: Map
+      - button "Sales" [ref=e19] [cursor=pointer]:
+        - img [ref=e20]
+        - generic [ref=e22]: Sales
+      - button "Planning" [ref=e23] [cursor=pointer]:
+        - img [ref=e24]
+        - generic [ref=e28]: Planning
+      - button "Heatmaps" [ref=e29] [cursor=pointer]:
+        - img [ref=e30]
+        - generic [ref=e34]: Heatmaps
+      - button "Areas" [ref=e35] [cursor=pointer]:
+        - img [ref=e36]
+        - generic [ref=e40]: Areas
+      - button "Saved Searches" [ref=e41] [cursor=pointer]:
+        - img [ref=e42]
+        - generic [ref=e44]: Saved Searches
+      - button "Reports" [ref=e45] [cursor=pointer]:
+        - img [ref=e46]
+        - generic [ref=e49]: Reports
+    - generic [ref=e50]:
+      - button "What's new" [ref=e51] [cursor=pointer]:
+        - img [ref=e52]
+        - generic [ref=e54]: What's new
+      - button "Help & Support" [ref=e56] [cursor=pointer]:
+        - img [ref=e57]
+        - generic [ref=e64]: Help & Support
+      - button "Settings" [ref=e65] [cursor=pointer]:
+        - img [ref=e66]
+        - generic [ref=e69]: Settings
+      - button "PA Pro Analyst Enterprise Plan" [ref=e70] [cursor=pointer]:
+        - generic [ref=e71]: PA
+        - generic [ref=e72]:
+          - strong [ref=e73]: Pro Analyst
+          - generic [ref=e74]: Enterprise Plan
+        - img [ref=e75]
+  - main [ref=e77]:
+    - generic [ref=e78]:
+      - generic [ref=e79]:
+        - img [ref=e80]
+        - textbox "Search addresses, postcodes, stations, areas" [ref=e83]:
+          - /placeholder: Search London addresses, postcodes, stations, areas...
+      - generic [ref=e84]:
+        - button "1 Apr 2024 - 30 Apr 2025" [ref=e85] [cursor=pointer]:
+          - img [ref=e86]
+          - text: 1 Apr 2024 - 30 Apr 2025
+          - img [ref=e88]
+        - button "Sales" [pressed] [ref=e90] [cursor=pointer]:
+          - img [ref=e91]
+          - text: Sales
+        - button "Districts" [ref=e93] [cursor=pointer]: Districts
+        - button "London" [ref=e97] [cursor=pointer]:
+          - text: London
+          - img [ref=e98]
+        - button "Notifications" [ref=e100] [cursor=pointer]:
+          - img [ref=e101]
+    - generic [ref=e104]:
+      - region "Find property opportunities across London" [ref=e105]:
+        - generic [ref=e106]:
+          - heading "Find property opportunities across London" [level=1] [ref=e107]
+          - paragraph [ref=e108]: Track sales, prices, planning applications, and rental yield on one interactive map.
+          - generic [ref=e109]:
+            - button "Assistant" [ref=e110] [cursor=pointer]:
+              - img [ref=e111]
+              - text: Ask Property AI
+            - button "Explore the map" [ref=e114] [cursor=pointer]:
+              - img [ref=e115]
+              - text: Explore the map
+          - generic [ref=e117]:
+            - generic [ref=e118]: HM Land Registry + ONS data
+            - generic [ref=e119]: 466,368 sales analysed
+            - generic [ref=e120]: Updated Apr 2026
+        - img
+      - generic "Market overview" [ref=e121]:
+        - article [ref=e122]:
+          - img [ref=e124]
+          - generic [ref=e127]:
+            - generic [ref=e128]: Median sale price
+            - strong [ref=e129]: £612,500
+            - generic [ref=e130]: +4.3% vs prev 12 months
+        - article [ref=e131]:
+          - img [ref=e133]
+          - generic [ref=e135]:
+            - generic [ref=e136]: Loaded sales
+            - strong [ref=e137]: 466,368
+            - generic [ref=e138]: Local dataset
+        - article [ref=e139]:
+          - img [ref=e141]
+          - generic [ref=e145]:
+            - generic [ref=e146]: Planning applications
+            - strong [ref=e147]: "312"
+            - generic [ref=e148]: "-2.3% vs prev 12 months"
+        - article [ref=e149]:
+          - img [ref=e151]
+          - generic [ref=e155]:
+            - generic [ref=e156]: Average yield
+            - strong [ref=e157]: 4.36%
+            - generic [ref=e158]: +0.18pp vs prev 12 months
+        - article [ref=e159]:
+          - img [ref=e161]
+          - generic [ref=e164]:
+            - generic [ref=e165]: Market activity
+            - strong [ref=e166]: High
+            - generic [ref=e167]: Top decile, live map area
+      - generic [ref=e168]:
+        - generic [ref=e169]:
+          - generic [ref=e170]: Map workspace
+          - strong [ref=e171]: Explore sales, postcode districts, filters, and postcode histories on the live map.
+        - generic [ref=e172]:
+          - button "Save search" [ref=e173] [cursor=pointer]:
+            - img [ref=e174]
+            - text: Save search
+          - button "Draft report" [ref=e176] [cursor=pointer]:
+            - img [ref=e177]
+            - text: Draft report
+      - generic [ref=e180]:
+        - complementary [ref=e181]:
+          - region "Filters" [ref=e182]:
+            - generic [ref=e183]:
+              - heading "Filters" [level=2] [ref=e184]
+              - button "Reset" [ref=e185] [cursor=pointer]:
+                - text: Reset
+                - img [ref=e186]
+            - generic [ref=e189]:
+              - generic [ref=e190]:
+                - generic [ref=e191]: Price range
+                - button "Any" [ref=e192] [cursor=pointer]:
+                  - text: Any
+                  - img [ref=e193]
+              - generic [ref=e197]:
+                - generic [ref=e198]: £100K
+                - generic [ref=e199]: £2M+
+              - generic [ref=e200]:
+                - generic [ref=e201]:
+                  - text: Minimum price
+                  - spinbutton "Minimum price" [ref=e202]
+                - generic [ref=e203]:
+                  - text: Maximum price
+                  - spinbutton "Maximum price" [ref=e204]
+            - group "Property type" [ref=e205]:
+              - generic [ref=e206]: Property type
+              - generic [ref=e207]:
+                - button "Detached" [pressed] [ref=e208] [cursor=pointer]:
+                  - img [ref=e209]
+                  - generic [ref=e212]: Detached
+                - button "Semi-detached" [pressed] [ref=e213] [cursor=pointer]:
+                  - img [ref=e214]
+                  - generic [ref=e217]: Semi-detached
+                - button "Terraced" [pressed] [ref=e218] [cursor=pointer]:
+                  - img [ref=e219]
+                  - generic [ref=e223]: Terraced
+                - button "Flat / maisonette" [pressed] [ref=e224] [cursor=pointer]:
+                  - img [ref=e225]
+                  - generic [ref=e228]: Flat / maisonette
+                - button "Other" [pressed] [ref=e229] [cursor=pointer]:
+                  - img [ref=e230]
+                  - generic [ref=e233]: Other
+            - generic [ref=e234]:
+              - generic [ref=e235]:
+                - generic [ref=e236]: Tenure
+                - button "All" [ref=e237] [cursor=pointer]:
+                  - text: All
+                  - img [ref=e238]
+              - group "Tenure" [ref=e240]:
+                - button "Freehold" [pressed] [ref=e241] [cursor=pointer]
+                - button "Leasehold" [pressed] [ref=e242] [cursor=pointer]
+            - generic [ref=e243]:
+              - generic [ref=e244]:
+                - generic [ref=e245]: Transaction date
+                - img [ref=e246]
+              - generic [ref=e249]:
+                - generic [ref=e250]:
+                  - text: From
+                  - textbox "From" [ref=e251]
+                - generic [ref=e252]:
+                  - text: To
+                  - textbox "To" [ref=e253]
+            - generic [ref=e254]:
+              - generic [ref=e255]:
+                - generic [ref=e256]: Radius near station
+                - checkbox "Radius near station" [checked] [ref=e257] [cursor=pointer]
+              - generic [ref=e258]:
+                - generic [ref=e259]: Planning applications
+                - checkbox "Planning applications" [checked] [ref=e260] [cursor=pointer]
+              - generic [ref=e261]:
+                - generic [ref=e262]: Granted
+                - generic [ref=e264]: Pending
+                - generic [ref=e266]: Refused
+            - generic [ref=e268]:
+              - button "Apply filters" [ref=e269] [cursor=pointer]
+              - generic [ref=e270]: Live results
+          - generic [ref=e271]:
+            - generic [ref=e272]: Current selection
+            - strong [ref=e273]: All property types
+            - generic [ref=e274]: All tenures
+            - generic [ref=e275]: All available dates
+            - generic [ref=e276]: Locations use postcode centroids
+          - generic [ref=e277]:
+            - generic [ref=e278]:
+              - generic [ref=e279]: Saved searches
+              - button "Save current" [ref=e280] [cursor=pointer]
+            - button "London all sales" [ref=e281] [cursor=pointer]:
+              - img [ref=e282]
+              - text: London all sales
+        - generic [ref=e284]:
+          - region "London property map" [ref=e285]:
+            - generic [ref=e286]:
+              - region "Map" [ref=e287]
+              - generic [ref=e288]:
+                - button "Zoom in" [ref=e289] [cursor=pointer]
+                - button "Zoom out" [ref=e291] [cursor=pointer]
+            - generic [ref=e293]:
+              - img [ref=e294]
+              - text: Map insights
+              - generic [ref=e297]: "ON"
+            - generic [ref=e298]: Clusters · Loading…
+            - generic [ref=e299]:
+              - img [ref=e300]
+              - text: Loading map data
+            - generic [ref=e302]:
+              - generic [ref=e303]:
+                - img [ref=e304]
+                - text: AI insight
+              - strong [ref=e307]: Undervalued pocket detected in SE1 near Borough station
+              - button "View matching areas" [ref=e308] [cursor=pointer]
+            - generic "Price legend" [ref=e309]:
+              - generic [ref=e310]:
+                - strong [ref=e311]: Map legend
+                - img [ref=e312]
+              - generic [ref=e316]:
+                - generic [ref=e318]: Clustered sales
+                - generic [ref=e319]: Bubble size shows transaction volume.
+              - generic [ref=e320]:
+                - generic [ref=e322]: Postcode zones
+                - generic [ref=e323]: Selected districts and analysis areas.
+              - generic [ref=e324]:
+                - generic [ref=e326]: Price bands
+                - generic [ref=e327]: Green under £400k, blue £400k-£800k, coral over £800k.
+              - generic [ref=e328]:
+                - generic [ref=e330]: Transport
+                - generic [ref=e331]: Nearby rail and underground stations.
+              - generic [ref=e332]: Points from zoom 12
+            - generic [ref=e333]: HM Land Registry Price Paid Data · OGL v3.0 · ONS postcode centroids · OGL v3.0
+          - region "Map analytics" [ref=e334]:
+            - article [ref=e335]:
+              - generic [ref=e336]:
+                - generic [ref=e337]: Sales trend
+                - generic [ref=e338] [cursor=pointer]: Monthly
+              - strong [ref=e339]: 466,368 sales
+              - img [ref=e340]
+            - article [ref=e342]:
+              - generic [ref=e344]: Property type breakdown
+              - generic [ref=e345]:
+                - generic [ref=e347]:
+                  - text: 2,458
+                  - generic [ref=e348]: Total sales
+                - list [ref=e349]:
+                  - listitem [ref=e350]: Flats 38%
+                  - listitem [ref=e352]: Terraced 24%
+                  - listitem [ref=e354]: Detached 19%
+                  - listitem [ref=e356]: Semi-detached 19%
+            - article [ref=e358]:
+              - generic [ref=e360]: Top postcode districts
+              - list [ref=e361]:
+                - listitem [ref=e362]:
+                  - generic [ref=e363]: CR0
+                  - generic [ref=e364]: £375,000
+                - listitem [ref=e366]:
+                  - generic [ref=e367]: E14
+                  - generic [ref=e368]: £560,650
+                - listitem [ref=e370]:
+                  - generic [ref=e371]: SW11
+                  - generic [ref=e372]: £805,000
+                - listitem [ref=e374]:
+                  - generic [ref=e375]: E17
+                  - generic [ref=e376]: £515,000
+            - article [ref=e378]:
+              - generic [ref=e379]:
+                - generic [ref=e380]: Automations
+                - button "View all" [ref=e381] [cursor=pointer]
+              - paragraph [ref=e382]:
+                - img [ref=e383]
+                - text: Weekly borough scan
+                - generic [ref=e386]: Active
+              - paragraph [ref=e387]:
+                - img [ref=e388]
+                - text: Planning alert monitor
+                - generic [ref=e391]: Active
+              - button "Create new automation" [ref=e392] [cursor=pointer]
+        - complementary [ref=e393]:
+          - generic [ref=e394]:
+            - generic [ref=e395]:
+              - img [ref=e396]
+              - heading "AI Copilot BETA" [level=2] [ref=e399]:
+                - text: AI Copilot
+                - generic [ref=e400]: BETA
+            - button "Close copilot" [ref=e401] [cursor=pointer]:
+              - img [ref=e402]
+          - generic [ref=e405]:
+            - generic [ref=e406]:
+              - generic [ref=e407]: Ask anything about the market
+              - textbox "Ask the property assistant" [disabled] [ref=e408]:
+                - /placeholder: Find undervalued terraced homes near stations with recent planning activity.
+              - generic [ref=e409]:
+                - img [ref=e410]
+                - button "Run agent" [disabled] [ref=e413]:
+                  - img [ref=e414]
+                  - text: Run agent
+                - img [ref=e417]
+            - region "Agent process" [ref=e420]:
+              - generic [ref=e421]:
+                - generic [ref=e422]: Agent process
+                - button "View details" [ref=e423] [cursor=pointer]:
+                  - text: View details
+                  - img [ref=e424]
+              - list [ref=e426]:
+                - listitem [ref=e427]:
+                  - img [ref=e428]
+                  - generic [ref=e431]: Scanning visible map area
+                  - generic [ref=e432]: Completed
+                - listitem [ref=e433]:
+                  - img [ref=e434]
+                  - generic [ref=e436]: Analyzing price anomalies
+                  - generic [ref=e437]: Ready
+                - listitem [ref=e438]:
+                  - img [ref=e439]
+                  - generic [ref=e442]: Checking planning applications
+                  - generic [ref=e443]: Pending
+                - listitem [ref=e444]:
+                  - img [ref=e445]
+                  - generic [ref=e447]: Preparing investment summary
+                  - generic [ref=e448]: Pending
+            - generic [ref=e450]:
+              - strong [ref=e451]: Try a market question
+              - generic [ref=e452]: SQL answers stay grounded in local transactions. RAG citations are used for methodology and limitations.
+            - generic [ref=e453]:
+              - generic [ref=e454]:
+                - generic [ref=e455]: AI insights
+                - generic [ref=e456] [cursor=pointer]: 3 new
+              - button "Undervalued pocket in SE1 Avg. £640k (-12%) vs predicted value High confidence" [ref=e457] [cursor=pointer]:
+                - strong [ref=e458]: Undervalued pocket in SE1
+                - generic [ref=e459]: Avg. £640k (-12%) vs predicted value
+                - generic [ref=e460]: High confidence
+              - 'button "High growth area: N1 +11% p.a. growth YoY High confidence" [ref=e461] [cursor=pointer]':
+                - strong [ref=e462]: "High growth area: N1"
+                - generic [ref=e463]: +11% p.a. growth YoY
+                - generic [ref=e464]: High confidence
+              - button "Planning activity spike in E2 +32% vs last 12 months Medium confidence" [ref=e465] [cursor=pointer]:
+                - strong [ref=e466]: Planning activity spike in E2
+                - generic [ref=e467]: +32% vs last 12 months
+                - generic [ref=e468]: Medium confidence
+            - generic [ref=e469]:
+              - generic [ref=e471]: Suggested actions
+              - generic [ref=e472]:
+                - button "Create watchlist" [ref=e473] [cursor=pointer]
+                - button "Generate area report" [ref=e474] [cursor=pointer]
+                - button "Explain price spike" [ref=e475] [cursor=pointer]
+                - button "Find similar deals" [ref=e476] [cursor=pointer]
+              - generic [ref=e477]: AI can make mistakes. Verify important information.
+      - generic "Report drafts" [ref=e478]:
+        - img [ref=e479]
+        - text: London Area Report draft
+        - button "Export" [ref=e482] [cursor=pointer]:
+          - img [ref=e483]
+          - text: Export

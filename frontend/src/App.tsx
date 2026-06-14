@@ -34,8 +34,7 @@ import { EMPTY_FILTERS, Filters as FiltersSchema } from '@schema';
 
 import { fetchMeta } from './api/client';
 import type { Filters, MapAction, MetaInfo, PropertyType } from './api/types';
-// Filters temporarily disabled — re-enable when the filter UI is reworked.
-// import { FilterPanel } from './components/FilterPanel';
+import { FilterPanel } from './components/FilterPanel';
 import { HistoryPanel } from './components/HistoryPanel';
 import { ChatPanel } from './features/chat/ChatPanel';
 import { MapView } from './map/MapView';
@@ -160,8 +159,7 @@ export default function App() {
   const [chatOpen, setChatOpen] = useState(true);
   const [chatFocusSignal, setChatFocusSignal] = useState(0);
   const [controlsOpen, setControlsOpen] = useState(false);
-  // setStationRadiusEnabled re-enabled with the filter panel; map legend still reads the value.
-  const [stationRadiusEnabled] = useState(true);
+  const [stationRadiusEnabled, setStationRadiusEnabled] = useState(true);
   const [planningEnabled, setPlanningEnabled] = useState(true);
   const [undoState, setUndoState] = useState<ExplorerState | null>(null);
   const [meta, setMeta] = useState<MetaInfo | null>(null);
@@ -424,7 +422,6 @@ export default function App() {
 
           <div className="workspace">
             <aside className={`control-rail ${controlsOpen ? 'open' : ''}`}>
-              {/* Filters temporarily disabled — re-enable when the filter UI is reworked.
               <FilterPanel
                 filters={filters}
                 onChange={setFilters}
@@ -434,7 +431,6 @@ export default function App() {
                 onPlanningChange={(enabled) => { setPlanningEnabled(enabled); showToast('Planning overlay updated', enabled ? 'Planning insight overlay is visible.' : 'Planning insight overlay hidden.', 'info'); }}
                 onApply={() => { setControlsOpen(false); showToast('Filters applied', `${propertyLabel(filters.types)} · ${filters.tenures?.join(',') ?? 'All tenures'}`, 'success'); }}
               />
-              */}
               <section className="control-section data-note">
                 <span>Current selection</span>
                 <strong>{filters.types?.length ? `${filters.types.length} property types` : 'All property types'}</strong>

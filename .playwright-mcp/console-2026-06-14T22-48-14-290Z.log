@@ -1,0 +1,4 @@
+[     180ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://127.0.0.1:5174/node_modules/.vite/deps/react-dom_client.js?v=6b33881f:14337
+[    4105ms] [WARNING] Expected value to be of type number, but found null instead. @ blob:http://127.0.0.1:5174/84d5fed1-8cf9-444b-b09c-35595d0fcc15:6956
+[    4106ms] [WARNING] Expected value to be of type number, but found null instead. @ blob:http://127.0.0.1:5174/84d5fed1-8cf9-444b-b09c-35595d0fcc15:6956
+[    4106ms] [WARNING] Expected value to be of type number, but found null instead. @ blob:http://127.0.0.1:5174/84d5fed1-8cf9-444b-b09c-35595d0fcc15:6956
