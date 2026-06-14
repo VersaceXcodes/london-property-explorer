@@ -397,20 +397,7 @@ export default function App() {
                 <span>Updated Apr 2026</span>
               </div>
             </div>
-            <div className="hero-art" aria-hidden="true">
-              <div className="hero-skyline">
-                <i className="building b1" />
-                <i className="building b2" />
-                <i className="building b3" />
-                <i className="building b4" />
-                <i className="building b5" />
-                <i className="building b6" />
-                <span className="landmark tower" />
-                <span className="landmark wheel" />
-                <span className="hero-pin"><MapPin size={58} /></span>
-                <span className="hero-street" />
-              </div>
-            </div>
+            <img className="hero-image" src="/images/london-hero.png" alt="" aria-hidden="true" />
           </section>
 
           <div className="metric-strip" aria-label="Market overview">
