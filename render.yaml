@@ -15,7 +15,7 @@ services:
       - key: DATABASE_URL
         sync: false
       - key: FRONTEND_ORIGIN
-        sync: false
+        value: https://lpe-frontend-pss5.onrender.com
       - key: ANTHROPIC_API_KEY
         sync: false
       - key: ANTHROPIC_MODEL
@@ -43,7 +43,7 @@ services:
       - key: NODE_VERSION
         value: 22.16.0
       - key: VITE_API_BASE_URL
-        sync: false
+        value: https://lpe-api-e7n7.onrender.com
     routes:
       - type: rewrite
         source: /*

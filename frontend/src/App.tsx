@@ -316,6 +316,14 @@ export default function App() {
     setReports((current) => [label, ...current.filter((item) => item !== label)].slice(0, 5));
     showToast('Report draft created', label, 'success');
   };
+  const exploreMap = () => {
+    setActiveView('Map');
+    setControlsOpen(false);
+    const workspace = dashboardRef.current?.querySelector<HTMLElement>('.workspace');
+    dashboardRef.current?.scrollTo({ top: workspace?.offsetTop ?? 0, behavior: 'smooth' });
+    showToast('Live map in focus', 'Supabase-backed sales data remains loaded locally.', 'info');
+  };
+  const analysedSales = meta ? meta.total.toLocaleString() : '466,368';
 
   return (
     <div className="property-app">
@@ -349,21 +357,18 @@ export default function App() {
           <form className="toolbar-search" onSubmit={handleSearch}>
             <Search size={19} />
             <span className="mobile-product-name">London Property Explorer</span>
-            <input aria-label="Search addresses, postcodes, stations, areas" placeholder="Search addresses, postcodes, stations, areas..." value={searchValue} onChange={(event) => setSearchValue(event.target.value)} />
+            <input aria-label="Search London addresses, postcodes, stations, areas" placeholder="Search London addresses, postcodes, stations, areas..." value={searchValue} onChange={(event) => setSearchValue(event.target.value)} />
           </form>
           <div className="toolbar-actions">
             <button className="toolbar-pill date-pill" type="button" onClick={() => setOpenMenu(openMenu === 'date' ? null : 'date')}><CalendarDays size={17} /> {dateLabel} <ChevronDown size={15} /></button>
-            <div className="segmented" aria-label="Map mode">
-              <button className={!choropleth ? 'active' : ''} type="button" onClick={() => setChoropleth(false)}>Sales</button>
-              <button className={choropleth ? 'active' : ''} type="button" onClick={() => setChoropleth(true)}><Layers3 size={15} /> Districts</button>
-            </div>
-            <button className="toolbar-pill hide-sm" type="button" onClick={() => setOpenMenu(openMenu === 'location' ? null : 'location')}><MapPin size={16} /> {locationLabel} <ChevronDown size={15} /></button>
+            <button className={!choropleth ? 'mode-pill active' : 'mode-pill'} type="button" aria-pressed={!choropleth} onClick={() => setChoropleth(false)}><BarChart3 size={16} /> Sales</button>
+            <button className={choropleth ? 'mode-pill active' : 'mode-pill'} type="button" aria-pressed={choropleth} onClick={() => setChoropleth(true)}><Layers3 size={16} /> Districts</button>
+            <button className="toolbar-pill hide-sm" type="button" onClick={() => setOpenMenu(openMenu === 'location' ? null : 'location')}>{locationLabel} <ChevronDown size={15} /></button>
             <button className="toolbar-pill hide-md" type="button" onClick={() => setOpenMenu(openMenu === 'property' ? null : 'property')}>{propertyLabel(filters.types)} <ChevronDown size={15} /></button>
             {undoState && <button className="toolbar-pill" type="button" title="Undo map change" onClick={undo}><Undo2 size={16} /> Undo</button>}
             <button className="toolbar-pill mobile-controls" type="button" title="Open filters" onClick={() => setControlsOpen((value) => !value)}><PanelLeft size={16} /> Filters</button>
-            <button className="toolbar-pill more-filters hide-sm" type="button" onClick={() => setControlsOpen((value) => !value)}><SlidersHorizontal size={16} /> More filters <b>2</b></button>
-            <button className="assistant-button" aria-label="Assistant" type="button" title="Open assistant" onClick={() => setChatOpen(true)}><Sparkles size={17} /> Ask AI</button>
-            <button className="icon-button quiet hide-sm" type="button" title="Notifications" onClick={() => setOpenMenu(openMenu === 'notifications' ? null : 'notifications')}><Bell size={17} /></button>
+            <button className="toolbar-pill more-filters hide-sm" type="button" onClick={() => setControlsOpen((value) => !value)}><SlidersHorizontal size={16} /> More filters</button>
+            <button className="icon-button topbar-bell" type="button" title="Notifications" onClick={() => setOpenMenu(openMenu === 'notifications' ? null : 'notifications')}><Bell size={17} /></button>
           </div>
           {openMenu && (
             <div className="topbar-popover" role="dialog" aria-label={`${openMenu} menu`}>
@@ -378,6 +383,36 @@ export default function App() {
         </header>
 
         <section ref={dashboardRef} className="map-dashboard">
+          <section className="hero-header" aria-labelledby="hero-title">
+            <div className="hero-copy">
+              <h1 id="hero-title">Find property opportunities across London</h1>
+              <p>Track sales, prices, planning applications, and rental yield on one interactive map.</p>
+              <div className="hero-actions">
+                <button className="hero-primary" type="button" onClick={() => setChatOpen(true)}><Sparkles size={18} /> Ask Property AI</button>
+                <button className="hero-secondary" type="button" onClick={exploreMap}><Map size={18} /> Explore the map</button>
+              </div>
+              <div className="hero-meta">
+                <span>HM Land Registry + ONS data</span>
+                <span>{analysedSales} sales analysed</span>
+                <span>Updated Apr 2026</span>
+              </div>
+            </div>
+            <div className="hero-art" aria-hidden="true">
+              <div className="hero-skyline">
+                <i className="building b1" />
+                <i className="building b2" />
+                <i className="building b3" />
+                <i className="building b4" />
+                <i className="building b5" />
+                <i className="building b6" />
+                <span className="landmark tower" />
+                <span className="landmark wheel" />
+                <span className="hero-pin"><MapPin size={58} /></span>
+                <span className="hero-street" />
+              </div>
+            </div>
+          </section>
+
           <div className="metric-strip" aria-label="Market overview">
             <MetricCard label="Median sale price" value="£612,500" delta="+4.3% vs prev 12 months" tone="green" Icon={Home} />
             <MetricCard label="Loaded sales" value={meta ? meta.total.toLocaleString() : '466,368'} delta={meta ? `${meta.from} to ${meta.to}` : 'Local dataset'} tone="blue" Icon={BarChart3} />
