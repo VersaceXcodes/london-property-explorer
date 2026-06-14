@@ -14,7 +14,7 @@ All requests go to `import.meta.env.VITE_API_BASE_URL` (Render web service origi
  │     ├── L1 ClusterLayer        ScatterplotLayer + TextLayer   (zoom < 12)
  │     ├── L2 PointsLayer         ScatterplotLayer               (zoom ≥ 12)
  │     └── L3 ChoroplethLayer     GeoJsonLayer                   (toggle, lazy)
- ├── V2 ControlPanel ───────── layer toggles, type chips, price min/max
+ ├── V2 ControlPanel ───────── layer toggles, type/tenure chips, price min/max, dates
  ├── V3 StatusPill ─────────── loading / count / truncation
  ├── V4 PropertyCard ───────── postcode history + SVG sparkline (click)
  ├── V5 Legend ─────────────── colour-ramp for the active layer
@@ -175,7 +175,7 @@ later toggles ─▶ instant (session cache)        either request fails ─▶ 
 
 ### 6.3 Filter change (V2 → L1/L2)
 
-Chips (D/S/T/F/O) and validated whole-pound price min/max (0–50,000,000; min ≤ max; commit on blur/Enter) update `filters` → same loop as §4. Choropleth is **not** filtered (district medians are all-data by design — note in UI copy: "District medians · all sales").
+Chips (D/S/T/F/O), tenure chips (F/L), validated whole-pound price min/max (0–50,000,000; min ≤ max; commit on blur/Enter), and date range values update `filters` → same loop as §4. Choropleth is **not** filtered (district medians are all-data by design — note in UI copy: "District medians · all sales").
 
 ### 6.4 Conversational data agent (V6, required M5 — design: `AGENTIC_AI.md`)
 

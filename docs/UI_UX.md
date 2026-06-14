@@ -109,9 +109,9 @@ Breakpoints: 768 px (layout switch), 1280 px (V4 grows to 400 px). Map fills 100
 ## 5. Component specs
 
 ### V2 Control panel
-- Sections: LAYERS (two toggle rows with switch control), TYPE (5 chips), PRICE (two numeric inputs), Clear (text button, visible only when filters active).
-- Chip states: default (`--surface-2`, `--text-2`) · selected (`--accent` 18 % bg, `--accent` text+border) · pressed scale 0.97. No-selection = all types (chips all neutral, caption "All types").
-- Price inputs commit on blur/Enter; values must be whole pounds in £0–£50,000,000 and min ≤ max. Invalid input shows inline error styling and keeps the previous valid filters — never sends a bad request.
+- Sections: LAYERS (two toggle rows with switch control), TYPE (5 chips), TENURE (Freehold/Leasehold chips), PRICE (two numeric inputs), DATE (from/to inputs), Clear (text button, visible only when filters active).
+- Chip states: default (`--surface-2`, `--text-2`) · selected (`--accent` 18 % bg, `--accent` text+border) · pressed scale 0.97. No-selection = all property types / all tenures.
+- Price inputs commit on blur/Enter; values must be whole pounds in £0–£50,000,000 and min ≤ max. Date inputs must be real ISO dates with from ≤ to. Invalid input shows inline error styling and keeps the previous valid filters — never sends a bad request.
 - Choropleth row carries the permanent caption: "District medians · all sales" (FR-304).
 
 ### V3 Status pill

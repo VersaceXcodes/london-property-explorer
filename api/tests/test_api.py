@@ -31,6 +31,12 @@ def test_invalid_bbox_and_history(client: TestClient) -> None:
     response = client.get("/api/transactions", params={"bbox": "bad", "zoom": 12})
     assert response.status_code == 400
     assert response.json()["error"]["code"] == "BAD_REQUEST"
+    bad_tenures = client.get(
+        "/api/transactions",
+        params={"bbox": "-0.3,51.4,0.1,51.7", "zoom": 12, "tenures": "L,L"},
+    )
+    assert bad_tenures.status_code == 400
+    assert bad_tenures.json()["error"]["code"] == "BAD_REQUEST"
     history = client.get("/api/postcode/sw114nb/history")
     assert history.status_code == 200
     assert history.json()["postcode"] == "SW11 4NB"

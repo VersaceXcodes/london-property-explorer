@@ -57,7 +57,7 @@ Fixture invariants (the "golden numbers"): exact row count, exact median for 2 k
 ### Backend unit (TC-B)
 - **TC-B1** bbox validation matrix: malformed, inverted, out-of-range, >2°-at-points-zoom → `BAD_BBOX`; valid passes (B-21.1/2).
 - **TC-B2** zoom boundary: 11 → clusters branch; 12 → points branch (FR-203 server half).
-- **TC-B3** Filter param matrix incl. `min>max` → 400; types whitelist; date parsing.
+- **TC-B3** Filter param matrix incl. `min>max` → 400; types whitelist; tenures whitelist/duplicate rejection; date parsing.
 - **TC-B4** Cell-size formula: expected metres at zooms 8/10/11 (Q1 constant).
 - **TC-B5** Binary encoder: encode fixture rows → assert `LPE1` magic, N, exact `8+23N` length, offsets, little-endian values, epoch dates, type codes, and null-padded postcodes. Bad magic, short/trailing bytes, over-cap N, non-ASCII/overlength postcode all fail closed.
 - **TC-B6** Postcode normalisation: `sw114nb`, ` SW11  4NB `, `Sw11 4Nb` → `SW11 4NB`; garbage → 400.
@@ -74,7 +74,7 @@ Fixture invariants (the "golden numbers"): exact row count, exact median for 2 k
 
 ### Frontend unit (TC-F)
 - **TC-F1** `decodePointsBinary`: backend-written golden buffer decodes every column; `postcodeAt` and `isoDateFromEpochDay` return exact values; invalid magic, wrong length, and over-cap count throw.
-- **TC-F2** `interleavePositions` correctness; `transactionsParams` builds exact query strings, floors fractional map zoom, omits null filters, and rejects invalid bbox/zoom/filter ranges or unknown formats.
+- **TC-F2** `interleavePositions` correctness; `transactionsParams` builds exact query strings including type/tenure/date filters, floors fractional map zoom, omits null filters, and rejects invalid bbox/zoom/filter ranges or unknown formats.
 - **TC-F3** Quantile `computeBreaks`: known arrays → known breaks; degenerate inputs (all-equal, n<5) don't crash.
 - **TC-F4** Fetch-loop logic: debounce and stale-drop; compatible contained cluster/untruncated-point entries hit; cluster integer-zoom changes miss; different filters miss; truncated points hit only on exact key and miss for a different contained viewport; superseded requests abort.
 - **TC-F5** `safeParse` guards: a contract-drifted fixture logs and falls through without throwing (FRONTEND_VIEWS §9).

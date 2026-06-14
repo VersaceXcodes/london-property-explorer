@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { ChatResponse, decodePointsBinary, isoDateFromEpochDay, postcodeAt, transactionsParams } from '@schema';
+import { ChatResponse, PostcodeHistory, decodePointsBinary, isoDateFromEpochDay, postcodeAt, transactionsParams } from '@schema';
 
 describe('shared API contract', () => {
   it('decodes the LPE1 binary layout', () => {
@@ -42,6 +42,27 @@ describe('shared API contract', () => {
       },
     });
     expect(response.metrics.route).toBe('sql');
+  });
+
+  it('accepts canonical HMLR transaction GUIDs in history payloads', () => {
+    const history = PostcodeHistory.parse({
+      postcode: 'SW11 4NB',
+      count: 1,
+      truncated: false,
+      entries: [{
+        id: 'dcd89d4c-9f27-0000-e053-6c04a8c0b6f7',
+        price: 485000,
+        date: '2024-03-01',
+        type: 'F',
+        tenure: 'L',
+        is_new: false,
+        paon: '12',
+        saon: null,
+        street: 'EXAMPLE ROAD',
+        town: 'LONDON',
+      }],
+    });
+    expect(history.entries[0].id).toBe('dcd89d4c-9f27-0000-e053-6c04a8c0b6f7');
   });
 
   it('serialises map filters into transaction query params', () => {

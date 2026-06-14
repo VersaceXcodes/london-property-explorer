@@ -36,6 +36,11 @@
 - Verified `POST /api/chat/stream` emitted `run_started`, `step_started`, completed execution steps, and `final`; the final response again reported 466,368 sales with route `sql`, model `anthropic/claude-sonnet-4.5`, latency 3,822 ms, and estimated cost $0.00172.
 - Refreshed the local frontend in the in-app browser after the OpenRouter configuration: the page shows 466,368 loaded sales, the `Ask AI` surface is enabled, no unavailable-state copy is visible, and console error logs are empty.
 - Tested the AI agent through the in-app Browser UI: SQL count prompt returned 466,368 sales with visible execution steps and grounded verification; `Highlight SW11 on the map` produced a reversible map action with visible Undo; unsupported weather prompt refused cleanly; browser console errors remained empty.
+- Made the visible UI controls functional instead of decorative: sidebar views, topbar date/location/property menus, search, save-search/report/automation actions, notifications/account/help/settings toasts, tenure/date/property filters, planning/transport toggles, AI insight shortcuts, and suggested Copilot actions now mutate app state or submit real agent prompts.
+- Extended the `/api/transactions` contract with a `tenures=F,L` filter across FastAPI validation, PostGIS queries, SQLite local repository, AI aggregate tools, `schema.js`, frontend state, docs, and tests.
+- Fixed a live postcode-history UI bug found during Playwright CLI smoke: Land Registry transaction GUIDs are canonical GUID strings but not always versioned UUIDs, so `schema.js` now accepts canonical GUIDs and the `SW11 4NB` history panel renders real Supabase rows instead of a validation error.
+- Added an inline SVG favicon to remove the browser-side `favicon.ico` 404 console error.
+- Improved the map visual design: cluster bubbles now use softer halos, smaller professional sizing, fewer high-signal labels, stronger white rings, clearer price-band colors, tone-coded tooltips, refined choropleth strokes, polished glass overlays, and a subtle basemap vignette/grid treatment.
 
 ## Local Validation
 
@@ -46,9 +51,9 @@
 | `pytest -q` | 39 passed, 1 protected live test skipped |
 | `npm audit --audit-level=high` | Pass, 0 vulnerabilities |
 | Frontend ESLint | Pass |
-| Vitest | 4 tests passed |
-| Production frontend build | Pass; 569 KB gzip main bundle warning remains for M4 measurement/code-splitting |
-| Playwright | 4 journeys passed across desktop and mobile projects |
+| Vitest | 6 tests passed |
+| Production frontend build | Pass; 573 KB gzip main bundle warning remains for M4 measurement/code-splitting |
+| Playwright | 5 journeys passed, 1 desktop-only toolbar journey intentionally skipped on mobile |
 | Deterministic route replay | 100% route accuracy, 100% unsupported refusal, 0 critical injection failures; live metrics intentionally incomplete |
 | In-app visual review | Redesigned local real-data map confirmed in Browser: KPI card shows 466,368 loaded sales, map badge showed `Clusters · 219,500 sales loaded` for the inspected overlay viewport, topbar/sidebar are pinned, copilot starts at the prompt, no map overlay collisions, and no horizontal overflow |
 | Local real-data API | `data/local/lpe-local.sqlite3` serves real clusters, points, history, stats, and metadata without Supabase |
@@ -57,6 +62,8 @@
 | OpenRouter provider adapter | Pass: full backend ruff/mypy/pytest pass; `api/tests/test_ai.py` has 11 tests including OpenRouter local JSON validation. Live `/api/chat` and `/api/chat/stream` SQL smokes pass through OpenRouter against Supabase. |
 | Browser AI capability refresh | Pass: `http://127.0.0.1:5174/` shows 466,368 loaded sales, enabled `Ask AI`, no unavailable copy, and no console errors after reload. |
 | Browser AI agent test | Pass: UI submitted SQL, map-action, and unsupported prompts through the Copilot; responses, steps, Apply/Undo behavior, and refusal behavior were visible; console errors were empty. |
+| UI functionality smoke | Pass: Playwright CLI on `http://127.0.0.1:5174/` opened date/property menus, applied Terraced + Leasehold filters against real Supabase map data, opened `SW11 4NB` history with rendered sale rows, and reported 0 console errors. Three OpenFreeMap/deck warnings about null numeric tile values remain non-fatal. |
+| Map design smoke | Pass: in-app Browser refreshed `http://127.0.0.1:5174/`; final screenshot showed smaller readable cluster bubbles and updated overlays; browser logs reported 0 errors/warnings. |
 
 ## Milestone State
 

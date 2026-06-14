@@ -41,10 +41,10 @@ Conventions: "the system" = frontend + API + DB acting together. **Must/Should/C
 
 | ID | Pri | Requirement | Acceptance criteria | Trace |
 |---|---|---|---|---|
-| FR-401 | Must | Users shall be able to filter transactions by property type (D/S/T/F/O, multi-select) and price range (min/max). | Selecting "Flats" + max £500k updates clusters *and* points to matching subset (server-filtered). | V2; B-21 |
+| FR-401 | Must | Users shall be able to filter transactions by property type (D/S/T/F/O, multi-select), tenure (F/L), and price range (min/max). | Selecting "Flats" + "Leasehold" + max £500k updates clusters *and* points to matching subset (server-filtered). | V2; B-21 |
 | FR-402 | Must | Filters shall apply to both transaction modes and persist across zoom/pan until changed. | Filter set at zoom 10 still applied after zooming to 14 and panning. | FRONTEND_VIEWS §6.3 |
 | FR-403 | Must | An active-filter state shall be visible and clearable in one action. | Chips show selected state; "Clear" resets to all data. | V2; UI/UX §5 |
-| FR-404 | Could | Date-range filtering shall be supported by the API (`from`/`to`) and may be exposed in the UI. | API filters by date correctly even if no UI control ships. | B-21 |
+| FR-404 | Should | Date-range filtering shall be supported by the API (`from`/`to`) and exposed in the UI. | Date menu and filter-panel date inputs update the server query params and map results. | B-21; V2 |
 
 ## FR-500 Property card
 

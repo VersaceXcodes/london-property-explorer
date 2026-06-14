@@ -32,10 +32,17 @@ interface HoverInfo {
   y: number;
   title: string;
   detail: string;
+  tone?: 'low' | 'mid' | 'high' | 'district';
 }
 
 type BBox = [number, number, number, number];
+type Rgba = [number, number, number, number];
 const LONDON_MAX_BOUNDS: [[number, number], [number, number]] = [[-0.72, 51.2], [0.36, 51.75]];
+const PRICE_BANDS = {
+  low: { label: 'Under £400k', color: [20, 184, 124] as const },
+  mid: { label: '£400k-£800k', color: [20, 105, 235] as const },
+  high: { label: 'Over £800k', color: [239, 91, 62] as const },
+} as const;
 
 function inflate(bbox: BBox): BBox {
   const width = bbox[2] - bbox[0];
@@ -60,10 +67,29 @@ function compactCount(value: number): string {
   return new Intl.NumberFormat('en-GB', { notation: 'compact', maximumFractionDigits: 1 }).format(value);
 }
 
-function priceColor(value: number, alpha = 205): [number, number, number, number] {
-  if (value < 400_000) return [28, 132, 89, alpha];
-  if (value < 800_000) return [26, 105, 170, alpha];
-  return [190, 63, 51, alpha];
+function priceBand(value: number): keyof typeof PRICE_BANDS {
+  if (value < 400_000) return 'low';
+  if (value < 800_000) return 'mid';
+  return 'high';
+}
+
+function priceColor(value: number, alpha = 220): Rgba {
+  const [red, green, blue] = PRICE_BANDS[priceBand(value)].color;
+  return [red, green, blue, alpha];
+}
+
+function clusterRadius(count: number): number {
+  return Math.max(120, Math.sqrt(count) * 30);
+}
+
+function clusterLabelSize(count: number): number {
+  return Math.max(10, Math.min(13, 9 + Math.sqrt(count) / 14));
+}
+
+function pointRadius(price: number): number {
+  if (price > 1_000_000) return 34;
+  if (price > 650_000) return 30;
+  return 26;
 }
 
 function payloadStatus(payload: TransactionPayload | null): string {
@@ -216,52 +242,85 @@ export function MapView({
         filled: true,
         stroked: true,
         lineWidthMinPixels: 1,
-        getLineColor: [255, 255, 255, 180],
+        lineWidthMaxPixels: 4,
+        getLineWidth: (feature: { properties: { code: string } }) => highlightedDistrict === feature.properties.code ? 3 : 1,
+        getLineColor: (feature: { properties: { code: string } }) => highlightedDistrict === feature.properties.code ? [124, 58, 237, 235] : [255, 255, 255, 210],
         getFillColor: (feature: { properties: { code: string } }) => {
           const code = feature.properties.code;
-          if (highlightedDistrict === code) return [217, 119, 6, 220];
+          if (highlightedDistrict === code) return [124, 58, 237, 120];
           const ratio = (stats.get(code)?.median ?? 0) / maximum;
-          return [27, 94 + Math.round(95 * ratio), 122 + Math.round(90 * ratio), 145];
+          return [20, 118 + Math.round(76 * ratio), 154 + Math.round(75 * ratio), 118];
         },
         pickable: true,
         onHover: ({ object, x, y }) => {
           if (!object) return setHover(null);
           const code = object.properties.code as string;
           const value = stats.get(code);
-          setHover({ x, y, title: code, detail: value ? `${value.sales.toLocaleString()} sales · ${money(value.median)}` : 'No sales' });
+          setHover({ x, y, title: code, detail: value ? `${value.sales.toLocaleString()} sales · ${money(value.median)}` : 'No sales', tone: 'district' });
         },
       }));
     }
     if (payload?.mode === 'clusters') {
       layers.push(new ScatterplotLayer({
+        id: 'cluster-halos',
+        data: payload.cells,
+        getPosition: (cell) => [cell.lng, cell.lat],
+        getRadius: (cell) => clusterRadius(cell.count) * 1.7,
+        radiusUnits: 'meters',
+        radiusMinPixels: 7,
+        radiusMaxPixels: 26,
+        getFillColor: (cell) => priceColor(cell.median_price, 28),
+        getLineColor: [255, 255, 255, 0],
+        stroked: false,
+        pickable: false,
+      }));
+      layers.push(new ScatterplotLayer({
         id: 'clusters',
         data: payload.cells,
         getPosition: (cell) => [cell.lng, cell.lat],
-        getRadius: (cell) => Math.max(110, Math.sqrt(cell.count) * 42),
+        getRadius: (cell) => clusterRadius(cell.count),
         radiusUnits: 'meters',
-        radiusMinPixels: 5,
-        radiusMaxPixels: 30,
-        getFillColor: (cell) => priceColor(cell.median_price, 190),
-        getLineColor: [255, 255, 255, 230],
-        lineWidthMinPixels: 1,
+        radiusMinPixels: 4,
+        radiusMaxPixels: 18,
+        getFillColor: (cell) => priceColor(cell.median_price, 208),
+        getLineColor: [255, 255, 255, 245],
+        lineWidthMinPixels: 1.25,
         stroked: true,
         pickable: true,
-        onHover: ({ object, x, y }) => setHover(object ? { x, y, title: `${object.count.toLocaleString()} sales`, detail: `Median ${money(object.median_price)}` } : null),
+        onHover: ({ object, x, y }) => setHover(object ? { x, y, title: `${object.count.toLocaleString()} sales`, detail: `${PRICE_BANDS[priceBand(object.median_price)].label} · median ${money(object.median_price)}`, tone: priceBand(object.median_price) } : null),
       }));
       layers.push(new TextLayer({
         id: 'cluster-labels',
-        data: payload.cells.filter((cell) => cell.count >= 10),
+        data: payload.cells.filter((cell) => cell.count >= 1_000),
         getPosition: (cell) => [cell.lng, cell.lat],
         getText: (cell) => compactCount(cell.count),
         getColor: [255, 255, 255, 245],
-        getSize: 11,
+        getSize: (cell) => clusterLabelSize(cell.count),
         sizeUnits: 'pixels',
-        fontWeight: 700,
+        fontWeight: 800,
         pickable: false,
       }));
     }
     if (payload?.mode === 'points') {
       const points = payload as BinaryPoints;
+      const radii = new Float32Array(points.length);
+      for (let index = 0; index < points.length; index += 1) radii[index] = pointRadius(points.prices[index]);
+      layers.push(new ScatterplotLayer({
+        id: 'point-halos',
+        data: {
+          length: points.length,
+          attributes: {
+            getPosition: { value: points.positions, size: 2 },
+          },
+        },
+        getRadius: 42,
+        radiusUnits: 'meters',
+        radiusMinPixels: 7,
+        radiusMaxPixels: 14,
+        getFillColor: [15, 25, 55, 34],
+        stroked: false,
+        pickable: false,
+      }));
       layers.push(new ScatterplotLayer({
         id: 'points',
         data: {
@@ -269,14 +328,14 @@ export function MapView({
           attributes: {
             getPosition: { value: points.positions, size: 2 },
             getFillColor: { value: points.colors, size: 4, type: 'unorm8', normalized: true },
+            getRadius: { value: radii, size: 1 },
           },
         },
-        getRadius: 28,
         radiusUnits: 'meters',
-        radiusMinPixels: 3,
-        radiusMaxPixels: 9,
-        getLineColor: [255, 255, 255, 210],
-        lineWidthMinPixels: 1,
+        radiusMinPixels: 4,
+        radiusMaxPixels: 11,
+        getLineColor: [255, 255, 255, 235],
+        lineWidthMinPixels: 1.5,
         stroked: true,
         pickable: true,
         onHover: ({ index, x, y }) => {
@@ -290,6 +349,7 @@ export function MapView({
             y,
             title: points.postcodes[index],
             detail: `${money(points.prices[index])} · ${PROPERTY_TYPE_LABELS[type]} · ${isoDateFromEpochDay(points.dates[index])}`,
+            tone: priceBand(points.prices[index]),
           });
         },
         onClick: ({ index }) => {
@@ -312,7 +372,7 @@ export function MapView({
       {loading && <div className="map-status"><LoaderCircle className="spin" size={16} /> Loading map data</div>}
       {error && <div className="map-status error"><AlertCircle size={16} /> {error}</div>}
       {choropleth && districtError && <div className="map-status error"><AlertCircle size={16} /> {districtError}</div>}
-      {hover && <div className="map-tooltip" style={{ left: hover.x + 12, top: hover.y + 12 }}><strong>{hover.title}</strong><span>{hover.detail}</span></div>}
+      {hover && <div className={`map-tooltip ${hover.tone ?? ''}`} style={{ left: hover.x + 12, top: hover.y + 12 }}><strong>{hover.title}</strong><span>{hover.detail}</span></div>}
       {planningEnabled && (
         <div className="map-callout">
           <span><Sparkles size={14} /> AI insight</span>
@@ -324,7 +384,7 @@ export function MapView({
         <div className="legend-title"><strong>Map legend</strong><Layers3 size={14} /></div>
         <span><i className="cluster-dot" /> <b>Clustered sales</b><small>Bubble size shows transaction volume.</small></span>
         <span><i className="zone-swatch" /> <b>Postcode zones</b><small>Selected districts and analysis areas.</small></span>
-        <span><i className="heat-gradient" /> <b>Price intensity</b><small>Green lower, blue mid, red higher.</small></span>
+        <span><i className="price-bands" /> <b>Price bands</b><small>Green under £400k, blue £400k-£800k, coral over £800k.</small></span>
         {stationRadiusEnabled && <span><i className="station-dot" /> <b>Transport</b><small>Nearby rail and underground stations.</small></span>}
         <small>Points from zoom {CLUSTER_ZOOM_THRESHOLD}</small>
       </div>

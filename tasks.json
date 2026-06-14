@@ -207,7 +207,8 @@
             "FastAPI routes pass fixture-backed contract tests.",
             "Generated docs/openapi.yaml now comes from the running FastAPI schema.",
             "2026-06-13: Local FastAPI served real-data /api/meta, /api/transactions clusters, /api/postcode/SW11%204NB/history, and /api/district-stats from data/local/lpe-local.sqlite3.",
-            "2026-06-13: /api/transactions request logging now records mode and count; chat/stream/feedback now set no-store."
+            "2026-06-13: /api/transactions request logging now records mode and count; chat/stream/feedback now set no-store.",
+            "2026-06-14: /api/transactions now accepts validated tenures=F,L filters, applies them in PostGIS and local SQLite paths, bypasses precomputed clusters for exact tenure-filtered results, and rejects invalid/duplicate tenure params. Full backend ruff format/check, mypy, and api pytest pass."
           ],
           "files": [
             "api/app",
@@ -313,10 +314,14 @@
             "npm --prefix frontend run e2e"
           ],
           "evidence": [
-            "Four Playwright journeys pass across desktop and mobile projects.",
+            "Five Playwright journeys pass across desktop and mobile projects; the detailed desktop toolbar journey is intentionally skipped on mobile because those controls collapse into the mobile filter drawer.",
             "Desktop and 390x844 layouts visually inspected in the in-app browser.",
             "Playwright verifies no eager district request and that Apply/Undo restores the previous layer mode.",
-            "2026-06-13: Added London maxBounds, initial zoom 11, detailed point hover content, Esc close for history, explicit stream-event validation through schema.js, and fixed package engines metadata."
+            "2026-06-13: Added London maxBounds, initial zoom 11, detailed point hover content, Esc close for history, explicit stream-event validation through schema.js, and fixed package engines metadata.",
+            "2026-06-14: Sidebar, toolbar menus, search, save/report/automation actions, notification/account/help/settings toasts, tenure/date/property filters, planning/transport toggles, AI insight shortcuts, and suggested Copilot actions now have functional handlers.",
+            "2026-06-14: Playwright CLI smoke against real Supabase-backed localhost applied Terraced + Leasehold filters, opened SW11 4NB history with rendered rows, and reported zero console errors after adding an inline favicon.",
+            "2026-06-14: Fixed the frontend schema to accept canonical HMLR GUIDs in transaction/history payloads; added regression coverage and verified the live history panel no longer shows a UUID validation error.",
+            "2026-06-14: Improved map visual design with smaller cluster scaling, soft halos, fewer high-volume labels, tone-coded tooltips, refined choropleth strokes, updated legend marks, and glass/vignette map overlays. Frontend lint/build and Playwright e2e pass; in-app Browser screenshot reported zero logs."
           ],
           "files": [
             "frontend/src/components",
@@ -353,7 +358,7 @@
             "scripts/measure.sh"
           ],
           "evidence": [
-            "Production bundle currently measures 564 KB gzip for the main JavaScript chunk.",
+            "Production bundle currently measures about 573 KB gzip for the main JavaScript chunk.",
             "Database, endpoint, decode, and interaction measurements require the loaded full stack."
           ],
           "files": [

@@ -935,11 +935,38 @@ legend {
   overflow: hidden;
   border: 1px solid #dfe7f5;
   border-radius: 10px;
-  background: #dce7f6;
-  box-shadow: 0 14px 32px rgb(31 63 120 / 5%);
+  background:
+    radial-gradient(circle at 58% 44%, rgb(8 104 255 / 10%), transparent 34%),
+    #dce7f6;
+  box-shadow: 0 18px 44px rgb(31 63 120 / 8%);
 }
 
-.map-canvas { position: absolute; inset: 0; }
+.map-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgb(246 249 255 / 50%) 0%, transparent 24%, transparent 70%, rgb(246 249 255 / 24%) 100%),
+    radial-gradient(circle at 50% 48%, transparent 42%, rgb(13 27 61 / 10%) 100%);
+  mix-blend-mode: multiply;
+}
+
+.map-stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgb(8 104 255 / 3%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(8 104 255 / 3%) 1px, transparent 1px);
+  background-size: 96px 96px;
+  opacity: .42;
+}
+
+.map-canvas { position: absolute; inset: 0; z-index: 0; }
 
 .map-insights-toggle,
 .map-mode-badge,
@@ -948,11 +975,11 @@ legend {
 .map-callout,
 .map-tooltip {
   position: absolute;
-  z-index: 5;
+  z-index: 6;
   border: 1px solid rgb(203 217 240 / 88%);
-  background: rgb(255 255 255 / 94%);
-  box-shadow: 0 18px 42px rgb(25 49 95 / 14%);
-  backdrop-filter: blur(10px);
+  background: linear-gradient(180deg, rgb(255 255 255 / 96%) 0%, rgb(248 251 255 / 92%) 100%);
+  box-shadow: 0 18px 44px rgb(25 49 95 / 16%);
+  backdrop-filter: blur(14px) saturate(1.15);
 }
 
 .map-insights-toggle {
@@ -1012,16 +1039,22 @@ legend {
 
 .map-tooltip {
   pointer-events: none;
-  z-index: 8;
+  z-index: 9;
   display: grid;
-  gap: 3px;
-  max-width: 230px;
-  border-radius: 8px;
-  padding: 10px 12px;
+  gap: 4px;
+  max-width: 250px;
+  border-left: 4px solid #0868ff;
+  border-radius: 9px;
+  padding: 10px 12px 10px 11px;
   color: #0d1b3d;
   font-size: 11px;
 }
 
+.map-tooltip.low { border-left-color: #14b87c; }
+.map-tooltip.mid { border-left-color: #1469eb; }
+.map-tooltip.high { border-left-color: #ef5b3e; }
+.map-tooltip.district { border-left-color: #7c3cff; }
+.map-tooltip strong { font-size: 12px; }
 .map-tooltip span { color: #65728f; }
 
 .map-callout {
@@ -1031,8 +1064,10 @@ legend {
   width: min(320px, calc(100% - 36px));
   display: grid;
   gap: 8px;
+  border-color: rgb(166 139 255 / 70%);
   border-radius: 10px;
   padding: 14px;
+  background: linear-gradient(180deg, rgb(255 255 255 / 97%) 0%, rgb(247 243 255 / 94%) 100%);
 }
 
 .map-callout span {
@@ -1054,11 +1089,16 @@ legend {
   height: 36px;
   border: 1px solid #9ebcff;
   border-radius: 7px;
-  background: #fff;
+  background: linear-gradient(180deg, #fff 0%, #f8fbff 100%);
   color: #075eff;
   font-size: 12px;
   font-weight: 850;
   cursor: pointer;
+}
+
+.map-callout button:hover {
+  border-color: #0868ff;
+  box-shadow: 0 8px 18px rgb(8 104 255 / 14%);
 }
 
 .map-legend {
@@ -1098,13 +1138,13 @@ legend {
 }
 
 .cluster-dot {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   display: block;
-  border: 3px solid #d6e5ff;
+  border: 3px solid #fff;
   border-radius: 999px;
-  background: #0868ff;
-  box-shadow: 0 0 0 2px rgb(8 104 255 / 16%);
+  background: radial-gradient(circle at 34% 30%, #fff 0 9%, #4f8cff 10% 28%, #0868ff 29% 100%);
+  box-shadow: 0 0 0 3px rgb(8 104 255 / 18%), 0 8px 16px rgb(8 104 255 / 26%);
 }
 .zone-swatch {
   width: 24px;
@@ -1114,12 +1154,14 @@ legend {
   border-radius: 6px;
   background: rgb(124 60 255 / 12%);
 }
+.price-bands,
 .heat-gradient {
   width: 24px;
   height: 10px;
   display: block;
   border-radius: 999px;
-  background: linear-gradient(90deg, #22c55e, #ffe35c, #ff4d4f);
+  background: linear-gradient(90deg, #14b87c 0 32%, #1469eb 32% 67%, #ef5b3e 67% 100%);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 90%), 0 0 0 2px rgb(8 104 255 / 10%);
 }
 .station-dot {
   width: 18px;

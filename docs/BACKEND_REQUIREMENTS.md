@@ -58,7 +58,7 @@ Functional and non-functional requirements for the FastAPI service in `/api`. Co
 `SELECT 1` against the pool. 200 `{"status":"ok"}` / 503 envelope. This is the uptime-pinger target — it must touch the DB (keeps Supabase unpaused), and must not be cached.
 
 ### B-21 `GET /api/transactions`
-1. Validate per `openapi.yaml`: bbox parses to 4 finite floats, legal lng/lat ranges, min<max; zoom 0–22; real ISO calendar dates; prices are integers in 0–50,000,000 with `min_price ≤ max_price`; `from ≤ to`; types are unique and ⊆ {D,S,T,F,O}. Violations → 400 `BAD_REQUEST` (malformed bbox → `BAD_BBOX`).
+1. Validate per `openapi.yaml`: bbox parses to 4 finite floats, legal lng/lat ranges, min<max; zoom 0–22; real ISO calendar dates; prices are integers in 0–50,000,000 with `min_price ≤ max_price`; `from ≤ to`; types are unique and ⊆ {D,S,T,F,O}; tenures are unique and ⊆ {F,L}. Violations → 400 `BAD_REQUEST` (malformed bbox → `BAD_BBOX`).
 2. **Points-mode guard:** if `zoom ≥ 12` and bbox spans > 2.0° on either side → 400 `BAD_BBOX` (prevents "whole world at zoom 12" abuse).
 3. `zoom < CLUSTER_ZOOM_THRESHOLD` → Q1 with `cell = 40075016.686 / 2^zoom / 256 * CELL_PX`; unfiltered zooms 6–11 use precomputed `cluster_cells`, while filtered requests use the exact dynamic aggregation over `transactions`. Respond `{mode:"clusters", cells:[…]}`. `format=bin` is ignored in clusters mode.
 4. `zoom ≥ threshold` → Q2 (`LIMIT MAX_POINTS+1`); pop the sentinel row → `truncated`.

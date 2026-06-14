@@ -66,6 +66,9 @@ export const Tenure = z.enum(['F', 'L']);
 export const Longitude = z.number().finite().min(-180).max(180);
 export const Latitude = z.number().finite().min(-90).max(90);
 export const SalePrice = z.number().int().min(10000).max(50000000);
+export const CanonicalUuid = z
+  .string()
+  .regex(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/, 'expected canonical UUID/GUID');
 export const IsoDate = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/, 'expected YYYY-MM-DD')
@@ -168,7 +171,7 @@ export const ClustersResponse = z.object({
 });
 
 export const TransactionPoint = z.object({
-  id: z.string().uuid(),
+  id: CanonicalUuid,
   lng: Longitude,
   lat: Latitude,
   price: SalePrice,
@@ -217,7 +220,7 @@ export const DistrictFeatureCollection = z.object({
 // ---------------------------------------------------------------------------
 
 export const HistoryEntry = z.object({
-  id: z.string().uuid(),
+  id: CanonicalUuid,
   price: SalePrice,
   date: IsoDate,
   type: PropertyType,
@@ -368,7 +371,7 @@ export const AgentMetrics = z.object({
 });
 
 export const ChatResponse = z.object({
-  run_id: z.string().uuid(),
+  run_id: CanonicalUuid,
   reply: z.string().min(1).max(8000),
   citations: z.array(Citation).max(10),
   steps: z.array(ChatStep),
@@ -399,7 +402,7 @@ export const FeedbackResponse = z.object({
 });
 
 export const ChatStreamPayloads = {
-  run_started: z.object({ run_id: z.string().uuid() }).strict(),
+  run_started: z.object({ run_id: CanonicalUuid }).strict(),
   step_started: z.object({ name: z.string().min(1).max(80) }).strict(),
   step_completed: ChatStep,
   citation: Citation,

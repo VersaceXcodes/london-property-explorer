@@ -163,8 +163,9 @@ FROM (
       AND ($6::int    IS NULL OR price >= $6)
       AND ($7::int    IS NULL OR price <= $7)
       AND ($8::text[] IS NULL OR property_type = ANY($8))
-      AND ($9::date   IS NULL OR date >= $9)
-      AND ($10::date  IS NULL OR date <= $10)
+      AND ($9::text[] IS NULL OR tenure = ANY($9))
+      AND ($10::date  IS NULL OR date >= $10)
+      AND ($11::date  IS NULL OR date <= $11)
   ) pts
   GROUP BY cell
 ) cells;
@@ -183,8 +184,9 @@ WHERE geom && ST_MakeEnvelope($1, $2, $3, $4, 4326)
   AND ($5::int    IS NULL OR price >= $5)
   AND ($6::int    IS NULL OR price <= $6)
   AND ($7::text[] IS NULL OR property_type = ANY($7))
-  AND ($8::date   IS NULL OR date >= $8)
-  AND ($9::date   IS NULL OR date <= $9)
+  AND ($8::text[] IS NULL OR tenure = ANY($8))
+  AND ($9::date   IS NULL OR date >= $9)
+  AND ($10::date  IS NULL OR date <= $10)
 ORDER BY geom <-> ST_SetSRID(
            ST_MakePoint(($1 + $3) / 2.0, ($2 + $4) / 2.0), 4326
          ),
@@ -236,8 +238,9 @@ WHERE ($1::text[] IS NULL OR district = ANY($1))
   AND ($2::int    IS NULL OR price >= $2)
   AND ($3::int    IS NULL OR price <= $3)
   AND ($4::text[] IS NULL OR property_type = ANY($4))
-  AND ($5::date   IS NULL OR date >= $5)
-  AND ($6::date   IS NULL OR date <= $6)
+  AND ($5::text[] IS NULL OR tenure = ANY($5))
+  AND ($6::date   IS NULL OR date >= $6)
+  AND ($7::date   IS NULL OR date <= $7)
 GROUP BY 1            -- only when grouping
 ORDER BY 1
 LIMIT 60;
