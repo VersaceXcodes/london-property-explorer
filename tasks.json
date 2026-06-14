@@ -319,10 +319,11 @@
             "Playwright verifies no eager district request and that Apply/Undo restores the previous layer mode.",
             "2026-06-13: Added London maxBounds, initial zoom 11, detailed point hover content, Esc close for history, explicit stream-event validation through schema.js, and fixed package engines metadata.",
             "2026-06-14: Sidebar, toolbar menus, search, save/report/automation actions, notification/account/help/settings toasts, tenure/date/property filters, planning/transport toggles, AI insight shortcuts, and suggested Copilot actions now have functional handlers.",
-            "2026-06-14: Playwright CLI smoke against real Supabase-backed localhost applied Terraced + Leasehold filters, opened SW11 4NB history with rendered rows, and reported zero console errors after adding an inline favicon.",
-            "2026-06-14: Fixed the frontend schema to accept canonical HMLR GUIDs in transaction/history payloads; added regression coverage and verified the live history panel no longer shows a UUID validation error.",
-            "2026-06-14: Improved map visual design with smaller cluster scaling, soft halos, fewer high-volume labels, tone-coded tooltips, refined choropleth strokes, updated legend marks, and glass/vignette map overlays. Frontend lint/build and Playwright e2e pass; in-app Browser screenshot reported zero logs."
-          ],
+        "2026-06-14: Playwright CLI smoke against real Supabase-backed localhost applied Terraced + Leasehold filters, opened SW11 4NB history with rendered rows, and reported zero console errors after adding an inline favicon.",
+        "2026-06-14: Fixed the frontend schema to accept canonical HMLR GUIDs in transaction/history payloads; added regression coverage and verified the live history panel no longer shows a UUID validation error.",
+        "2026-06-14: Improved map visual design with smaller cluster scaling, soft halos, fewer high-volume labels, tone-coded tooltips, refined choropleth strokes, updated legend marks, and glass/vignette map overlays. Frontend lint/build and Playwright e2e pass; in-app Browser screenshot reported zero logs.",
+        "2026-06-14: Updated the app header to the latest PropertyIQ-style reference with stacked logo, wider search/date/actions toolbar, separate Sales/Districts mode buttons, hero opportunity banner, real-data metadata, and functional Ask Property AI / Explore the map CTAs. Frontend ESLint, Vitest, production build, and Playwright e2e pass; Browser reload during the change showed the new header and zero error/warning logs before a final aria-label-only correction."
+      ],
           "files": [
             "frontend/src/components",
             "frontend/src/styles",
@@ -340,7 +341,7 @@
         {
           "id": "M4-T1",
           "title": "Measure and optimize",
-          "status": "pending",
+          "status": "in_progress",
           "priority": "P0",
           "depends_on": [
             "M3-T2"
@@ -359,13 +360,15 @@
           ],
           "evidence": [
             "Production bundle currently measures about 573 KB gzip for the main JavaScript chunk.",
-            "Database, endpoint, decode, and interaction measurements require the loaded full stack."
+            "2026-06-14: Fixed scripts/measure.sh so curl failures fail the measurement run instead of being recorded as zero-byte rows.",
+            "2026-06-14: Live Render five-run measurements against https://lpe-api-e7n7.onrender.com completed: clusters median 0.571 s and 8,744 bytes; points JSON median 4.087 s and 3,612,229 bytes; points binary median 2.352 s and 575,008 bytes.",
+            "2026-06-14: Render dense point-query timings miss the documented M4 ceilings, so M4-T1 remains open for tuning or an explicit accepted deviation."
           ],
           "files": [
             "README.md",
             "scripts/measure.sh"
           ],
-          "notes": "Cannot complete without running the full stack and real dataset."
+          "notes": "Initial live measurements exist; performance budgets are not yet met on Render free tier."
         },
         {
           "id": "M4-T2",
@@ -390,14 +393,19 @@
           ],
           "evidence": [
             "Render Blueprint and smoke script implemented.",
-            "No deployment URL, 24-hour check, or 7-day check exists yet."
+            "2026-06-14: Public GitHub repository created and pushed at https://github.com/VersaceXcodes/london-property-explorer.",
+            "2026-06-14: Render Blueprint deployed from main. Frontend URL: https://lpe-frontend-pss5.onrender.com. API URL: https://lpe-api-e7n7.onrender.com.",
+            "2026-06-14: scripts/smoke.sh https://lpe-api-e7n7.onrender.com passed; /api/meta returned 466,368 rows with date range 2021-01-01 to 2026-04-30; CORS preflight from the live frontend origin passed.",
+            "2026-06-14: Narrow binary points smoke returned application/octet-stream, magic LPE1, count 2,616, 60,176 bytes, X-Truncated=false.",
+            "2026-06-14: In-app Browser smoke of the live frontend loaded the app title, 466,368 sales analysed, map clusters, and zero console errors/warnings.",
+            "No 24-hour check or 7-day check exists yet."
           ],
           "files": [
             "render.yaml",
             "scripts/smoke.sh",
             "README.md"
           ],
-          "notes": "Requires external credentials and provider setup."
+          "notes": "Initial Render deploy is live. Durability checks and pinger configuration remain pending. Production AI is disabled until provider/Pinecone/LangSmith credentials are configured."
         }
       ]
     },

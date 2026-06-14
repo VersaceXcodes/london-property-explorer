@@ -12,12 +12,12 @@ measure() {
   local url="$2"
   local accept="$3"
   for run in 1 2 3 4 5; do
-    read -r time size < <(
-      curl --fail --silent --show-error --output /dev/null \
-        --header "Accept: $accept" \
-        --write-out '%{time_total} %{size_download}' \
-        "$url"
-    )
+    local output
+    output=$(curl --fail --silent --show-error --output /dev/null \
+      --header "Accept: $accept" \
+      --write-out '%{time_total} %{size_download}' \
+      "$url")
+    read -r time size <<<"$output"
     printf '%s\t%s\t%s\t%s\n' "$name" "$run" "$time" "$size" >>"$RESULTS"
   done
 }
@@ -26,4 +26,3 @@ measure clusters "$API_BASE_URL/api/transactions?bbox=$BBOX&zoom=11" application
 measure points_json "$API_BASE_URL/api/transactions?bbox=$BBOX&zoom=12" application/json
 measure points_binary "$API_BASE_URL/api/transactions?bbox=$BBOX&zoom=12&format=bin" application/octet-stream
 printf 'Measurements written to %s\n' "$RESULTS"
-

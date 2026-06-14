@@ -66,6 +66,14 @@ Every default exists to keep this path frictionless: choropleth off (points are 
 
 ## 4. Layout
 
+The implemented desktop shell now follows the 2026-06-14 PropertyIQ-style reference:
+a persistent left navigation rail, a single-row search and filter toolbar, and a
+compact opportunity banner above the KPI strip. The toolbar keeps the real app
+controls visible in this order: London search, date range, Sales/Districts mode,
+location, property type, more filters, and notifications. The banner is not a
+landing page replacement; its CTAs open the grounded AI panel or scroll the existing
+live map into focus, and the real map remains directly below the header metrics.
+
 ### Desktop (≥ 768 px)
 
 ```

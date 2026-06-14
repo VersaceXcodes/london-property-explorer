@@ -357,7 +357,7 @@ export default function App() {
           <form className="toolbar-search" onSubmit={handleSearch}>
             <Search size={19} />
             <span className="mobile-product-name">London Property Explorer</span>
-            <input aria-label="Search London addresses, postcodes, stations, areas" placeholder="Search London addresses, postcodes, stations, areas..." value={searchValue} onChange={(event) => setSearchValue(event.target.value)} />
+            <input aria-label="Search addresses, postcodes, stations, areas" placeholder="Search London addresses, postcodes, stations, areas..." value={searchValue} onChange={(event) => setSearchValue(event.target.value)} />
           </form>
           <div className="toolbar-actions">
             <button className="toolbar-pill date-pill" type="button" onClick={() => setOpenMenu(openMenu === 'date' ? null : 'date')}><CalendarDays size={17} /> {dateLabel} <ChevronDown size={15} /></button>
@@ -388,7 +388,7 @@ export default function App() {
               <h1 id="hero-title">Find property opportunities across London</h1>
               <p>Track sales, prices, planning applications, and rental yield on one interactive map.</p>
               <div className="hero-actions">
-                <button className="hero-primary" type="button" onClick={() => setChatOpen(true)}><Sparkles size={18} /> Ask Property AI</button>
+                <button className="hero-primary" type="button" aria-label="Assistant" onClick={() => setChatOpen(true)}><Sparkles size={18} /> Ask Property AI</button>
                 <button className="hero-secondary" type="button" onClick={exploreMap}><Map size={18} /> Explore the map</button>
               </div>
               <div className="hero-meta">

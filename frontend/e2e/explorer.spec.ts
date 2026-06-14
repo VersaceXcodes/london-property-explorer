@@ -78,10 +78,10 @@ test('reviewer can stream an answer and apply a map proposal', async ({ page }) 
   await expect(page.getByText('SW11 recorded 100 sales.')).toBeVisible();
   await page.getByRole('button', { name: 'Highlight SW11' }).click();
   await expect(page.getByRole('button', { name: 'Undo' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Districts' })).toHaveClass('active');
+  await expect(page.getByRole('button', { name: 'Districts' })).toHaveClass(/active/);
   await expect.poll(() => districtRequests).toBe(2);
   await page.getByRole('button', { name: 'Undo' }).click();
-  await expect(page.getByRole('button', { name: 'Districts' })).not.toHaveClass('active');
+  await expect(page.getByRole('button', { name: 'Districts' })).not.toHaveClass(/active/);
 });
 
 test('mobile controls fit the viewport', async ({ page }) => {

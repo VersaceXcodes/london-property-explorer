@@ -66,6 +66,28 @@ DATABASE_URL="$SUPABASE_ADMIN_DATABASE_URL" APP_READER_PASSWORD='...' \
 
 The known source snapshot must produce 466,368 final rows. The pipeline aborts on count/domain drift, duplicate ONSPD keys, invalid retained coordinates, join coverage below 99.9%, or a loaded database at or above 450 MB. The loader publishes schema, data, metadata, precomputed low-zoom clusters, read-only-role credentials, counts, and size checks in one transaction; configure the API `DATABASE_URL` with the resulting `app_reader` credentials.
 
+## Live Deployment
+
+- Frontend: https://lpe-frontend-pss5.onrender.com
+- API: https://lpe-api-e7n7.onrender.com
+- GitHub: https://github.com/VersaceXcodes/london-property-explorer
+
+Render smoke on 2026-06-14 passed for the API health, capabilities, and metadata endpoints. The live API reports 466,368 transactions from 2021-01-01 to 2026-04-30, and CORS allows the live frontend origin. A narrow binary smoke returned `LPE1`, 2,616 rows, and `X-Truncated: false`.
+
+Production AI is currently disabled because Render does not have an Anthropic/OpenRouter key, Pinecone key, or LangSmith key configured.
+
+### Current Render Measurements
+
+Five-run live measurements on Render free tier:
+
+| Endpoint | Median time | Median payload |
+|---|---:|---:|
+| clusters | 0.571 s | 8,744 bytes |
+| points JSON | 4.087 s | 3,612,229 bytes |
+| points binary | 2.352 s | 575,008 bytes |
+
+These measurements are real, but the point endpoints are over the documented M4 budget and still need tuning or an explicitly accepted deviation. The 24-hour and 7-day durability checks are not yet recorded.
+
 ## Knowledge Index
 
 ```bash
@@ -92,7 +114,7 @@ PATH="$HOME/.nvm/versions/node/v22.16.0/bin:$PATH" npm --prefix frontend run bui
 PATH="$HOME/.nvm/versions/node/v22.16.0/bin:$PATH" npm --prefix frontend run e2e
 ```
 
-Current local evidence: 39 Python tests and 4 frontend unit tests pass; 4 Playwright journeys pass across desktop and mobile. The app also runs locally against the generated 466,368-row SQLite read model. Supabase now contains the 466,368-row PostGIS snapshot, and OpenRouter SQL chat/SSE smoke passes locally against Supabase. Deployment smoke, Pinecone/LangSmith evals, and 24-hour/7-day durability checks remain unverified until deployed services exist.
+Current local evidence: 39 Python tests and 6 frontend unit tests pass; 5 Playwright journeys pass with one desktop-only toolbar journey intentionally skipped on mobile. The app also runs locally against the generated 466,368-row SQLite read model. Supabase now contains the 466,368-row PostGIS snapshot, and OpenRouter SQL chat/SSE smoke passes locally against Supabase. Initial Render deployment smoke passes; Pinecone/LangSmith evals and 24-hour/7-day durability checks remain unverified.
 
 ## Limits And Licensing
 

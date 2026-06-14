@@ -1,8 +1,8 @@
 # Project Progress
 
-**Last updated:** 2026-06-14  
-**Current phase:** M4 performance/deployment evidence pending  
-**Overall status:** Local real-data app is running from Supabase PostGIS and OpenRouter SQL chat is smoke-tested; deployment, Pinecone, LangSmith, and full live-eval release evidence remain pending
+**Last updated:** 2026-06-14
+**Current phase:** M4 deployed, performance tuning and durability evidence pending
+**Overall status:** Render frontend/API are live on Supabase PostGIS; live API smoke passes; Render point-query performance, 24-hour/7-day durability, Pinecone, LangSmith, and full live-eval release evidence remain pending
 
 ## Verified Evidence
 
@@ -41,6 +41,12 @@
 - Fixed a live postcode-history UI bug found during Playwright CLI smoke: Land Registry transaction GUIDs are canonical GUID strings but not always versioned UUIDs, so `schema.js` now accepts canonical GUIDs and the `SW11 4NB` history panel renders real Supabase rows instead of a validation error.
 - Added an inline SVG favicon to remove the browser-side `favicon.ico` 404 console error.
 - Improved the map visual design: cluster bubbles now use softer halos, smaller professional sizing, fewer high-signal labels, stronger white rings, clearer price-band colors, tone-coded tooltips, refined choropleth strokes, polished glass overlays, and a subtle basemap vignette/grid treatment.
+- Updated the app header to match the latest PropertyIQ-style reference: the sidebar logo is stacked, the topbar uses a wider London search plus separate Sales/Districts mode buttons, and a compact opportunity banner adds real-data metadata plus functional Ask Property AI and Explore the map CTAs.
+- Created and pushed the public GitHub repository `https://github.com/VersaceXcodes/london-property-explorer`.
+- Deployed the Render Blueprint from `main`: frontend `https://lpe-frontend-pss5.onrender.com`, API `https://lpe-api-e7n7.onrender.com`, both on free Render services. API `/api/health` returned 200, `/api/meta` returned 466,368 rows with 2021-01-01 to 2026-04-30, CORS allows `https://lpe-frontend-pss5.onrender.com`, and a narrow binary points request returned `LPE1`, 2,616 rows, 60,176 bytes, `X-Truncated: false`.
+- Ran `scripts/smoke.sh https://lpe-api-e7n7.onrender.com`: passed. Live `/api/capabilities` reports `chat=false`, `rag=false`, `tracing=false`, `streaming=false`, and `feedback=false` because no production AI provider/Pinecone/LangSmith credentials were configured in Render.
+- Fixed `scripts/measure.sh` so curl failures fail the script instead of recording zero-byte rows; five-run live Render measurements completed with medians: clusters 0.571 s / 8,744 bytes, points JSON 4.087 s / 3,612,229 bytes, points binary 2.352 s / 575,008 bytes. These miss the documented M4 point-query ceilings and require tuning or an explicit accepted deviation.
+- Verified the live frontend in the in-app Browser: title `London Property Explorer`, 466,368 sales analysed, clusters rendered with 248,523 sales loaded in the inspected viewport, AI panel disabled with unavailable copy, and browser error/warning logs were empty.
 
 ## Local Validation
 
@@ -64,6 +70,10 @@
 | Browser AI agent test | Pass: UI submitted SQL, map-action, and unsupported prompts through the Copilot; responses, steps, Apply/Undo behavior, and refusal behavior were visible; console errors were empty. |
 | UI functionality smoke | Pass: Playwright CLI on `http://127.0.0.1:5174/` opened date/property menus, applied Terraced + Leasehold filters against real Supabase map data, opened `SW11 4NB` history with rendered sale rows, and reported 0 console errors. Three OpenFreeMap/deck warnings about null numeric tile values remain non-fatal. |
 | Map design smoke | Pass: in-app Browser refreshed `http://127.0.0.1:5174/`; final screenshot showed smaller readable cluster bubbles and updated overlays; browser logs reported 0 errors/warnings. |
+| Header redesign smoke | Pass: frontend ESLint, Vitest, production build, and Playwright e2e pass after the header refactor and aria-label correction. In-app Browser reload during the header update showed the new topbar/banner text, no horizontal overflow, and zero error/warning logs. |
+| Render API smoke | Pass: `scripts/smoke.sh https://lpe-api-e7n7.onrender.com`; `/api/meta` returned 466,368 rows; CORS preflight from the live frontend origin passed; narrow binary endpoint returned valid `LPE1`. |
+| Render frontend smoke | Pass: `https://lpe-frontend-pss5.onrender.com` loads the app shell, real meta count, map clusters, and no browser console errors/warnings in the in-app Browser. |
+| Render measurements | Completed but over budget: five-run medians were clusters 0.571 s, points JSON 4.087 s, points binary 2.352 s. |
 
 ## Milestone State
 
@@ -72,8 +82,8 @@
 | M0 Governance and tooling | Complete | None |
 | M1 Pipeline and PostGIS | Complete | None |
 | M2 FastAPI | Complete with Supabase smoke | Full deployed smoke still belongs to M4 |
-| M3 React map | Complete locally with real data | Record performance measurements against production-parity stack |
-| M4 Performance and deployment | Pending | Deploy Render/Supabase, run five-run measurements, smoke, 24-hour, and 7-day checks |
+| M3 React map | Complete locally with real data | None for local milestone; production perf belongs to M4 |
+| M4 Performance and deployment | Pending | Optimize or accept Render performance deviations, configure pinger, record 24-hour and 7-day checks |
 | M5 Agentic AI | Implemented, OpenRouter SQL smoke verified | Build Pinecone namespace, enable LangSmith, run complete live eval suite, and pass every release threshold |
 | M6 Release gate | Pending | Requires all external evidence above |
 
@@ -87,10 +97,10 @@
 
 ## Next Work
 
-1. Deploy the API/frontend with `render.yaml` and run `scripts/smoke.sh` and `scripts/measure.sh` against the live URLs.
-2. Capture Render/Supabase five-run performance evidence and decide whether any remaining cold-start or serialization tuning is needed.
-3. Build a new Pinecone namespace, enable LangSmith tracing, run complete live evals, and promote only after the report passes.
-4. Record 24-hour and 7-day durability checks, then close M6.
+1. Tune Render/Supabase dense point query performance, reduce the frontend bundle if needed, or explicitly accept the measured deviation.
+2. Configure the required uptime pinger for `https://lpe-api-e7n7.onrender.com/api/health`, then record 24-hour and 7-day durability checks.
+3. Add production AI provider credentials if chat should be enabled on Render; build a new Pinecone namespace, enable LangSmith tracing, run complete live evals, and promote only after the report passes.
+4. Re-run `scripts/smoke.sh` and `scripts/measure.sh` after any deployment changes and record fresh evidence.
 
 ## Update Rule
 
