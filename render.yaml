@@ -16,10 +16,20 @@ services:
         sync: false
       - key: FRONTEND_ORIGIN
         value: https://lpe-frontend-pss5.onrender.com
+      - key: AI_PROVIDER
+        value: openrouter
       - key: ANTHROPIC_API_KEY
         sync: false
       - key: ANTHROPIC_MODEL
         value: claude-haiku-4-5
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: OPENROUTER_MODEL
+        value: anthropic/claude-sonnet-4.5
+      - key: OPENROUTER_BASE_URL
+        value: https://openrouter.ai/api/v1
+      - key: OPENROUTER_APP_TITLE
+        value: London Property Explorer
       - key: PINECONE_API_KEY
         sync: false
       - key: PINECONE_INDEX

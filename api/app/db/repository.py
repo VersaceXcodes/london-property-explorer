@@ -67,6 +67,19 @@ class PostgresRepository:
     def __init__(self, pool: asyncpg.Pool) -> None:
         self.pool = pool
 
+    @staticmethod
+    def _is_unfiltered_total(filters: AggregateFilters) -> bool:
+        return (
+            filters.group_by is None
+            and filters.districts is None
+            and filters.min_price is None
+            and filters.max_price is None
+            and filters.types is None
+            and filters.tenures is None
+            and filters.from_date is None
+            and filters.to_date is None
+        )
+
     async def _fetch(self, query: str, *args: object) -> list[Row]:
         try:
             async with self.pool.acquire() as connection:
@@ -145,6 +158,18 @@ class PostgresRepository:
         return await self._fetchrow(queries.META)
 
     async def aggregate_sales(self, filters: AggregateFilters) -> list[Row]:
+        if self._is_unfiltered_total(filters):
+            meta = await self.meta()
+            return [
+                {
+                    "group": None,
+                    "sales": meta["total"],
+                    "median_price": None,
+                    "from": meta["from"],
+                    "to": meta["to"],
+                }
+            ]
+
         expressions = {
             "year": "to_char(date_trunc('year', date), 'YYYY')",
             "month": "to_char(date_trunc('month', date), 'YYYY-MM')",
