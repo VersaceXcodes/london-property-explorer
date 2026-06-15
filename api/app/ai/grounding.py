@@ -64,5 +64,16 @@ def verify_grounding(
     }
     ungrounded = claimed - allowed
     if ungrounded:
-        return GroundingResult(False, "response introduced a numeric claim absent from SQL facts")
+        raw_ungrounded = sorted(
+            {
+                token.strip()
+                for token in NUMBER.findall(reply)
+                if ((value := _normalise_number(token)) is not None and value in ungrounded)
+            }
+        )
+        claims = ", ".join(raw_ungrounded)
+        return GroundingResult(
+            False,
+            f"response introduced numeric claims absent from SQL facts: {claims}",
+        )
     return GroundingResult(True, "numeric claims and citations are grounded")

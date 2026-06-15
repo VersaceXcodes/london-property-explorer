@@ -254,6 +254,29 @@ def test_grounding_accepts_price_shorthand_when_sql_has_full_numbers() -> None:
     assert result.valid
 
 
+def test_grounding_names_derived_compare_claims_for_retry() -> None:
+    result = verify_grounding(
+        reply=(
+            "SW11 has a median sale price of £805,000 across 7,544 sales. "
+            "N1 has a median sale price of £678,500 across 4,999 sales. "
+            "SW11 is £126,500, or 19%, higher than N1."
+        ),
+        cited_ids=[],
+        evidence_ids=set(),
+        evidence_texts=[],
+        sql_facts=[
+            {"group": "N1", "sales": 4999, "median_price": 678500},
+            {"group": "SW11", "sales": 7544, "median_price": 805000},
+        ],
+        sql_plan=None,
+        require_citation=False,
+    )
+
+    assert not result.valid
+    assert "£126,500" in result.reason
+    assert "19%" in result.reason
+
+
 @pytest.mark.asyncio
 async def test_pinecone_outage_returns_degraded_empty_evidence() -> None:
     class BrokenAdapter:
