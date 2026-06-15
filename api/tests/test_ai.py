@@ -237,6 +237,23 @@ def test_grounding_ignores_untrusted_question_numbers_and_requires_rag_citations
     assert grounded.valid
 
 
+def test_grounding_accepts_price_shorthand_when_sql_has_full_numbers() -> None:
+    result = verify_grounding(
+        reply="SW11 had a median sale price of £805k while N1 was £1.2m.",
+        cited_ids=[],
+        evidence_ids=set(),
+        evidence_texts=[],
+        sql_facts=[
+            {"group": "SW11", "sales": 4102, "median_price": 805000},
+            {"group": "N1", "sales": 3900, "median_price": 1200000},
+        ],
+        sql_plan=None,
+        require_citation=False,
+    )
+
+    assert result.valid
+
+
 @pytest.mark.asyncio
 async def test_pinecone_outage_returns_degraded_empty_evidence() -> None:
     class BrokenAdapter:

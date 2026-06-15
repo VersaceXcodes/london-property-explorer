@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
-NUMBER = re.compile(r"(?<![A-Za-z])(?:£|\$)?-?\d[\d,]*(?:\.\d+)?%?")
+NUMBER = re.compile(r"(?<![A-Za-z])(?:£|\$)?-?\d[\d,]*(?:\.\d+)?\s*[kKmM]?%?")
 
 
 @dataclass(frozen=True, slots=True)
@@ -16,9 +16,17 @@ class GroundingResult:
 
 
 def _normalise_number(value: str) -> Decimal | None:
-    cleaned = value.replace(",", "").replace("£", "").replace("$", "").removesuffix("%")
+    cleaned = value.replace(",", "").replace("£", "").replace("$", "").replace(" ", "")
+    cleaned = cleaned.removesuffix("%")
+    multiplier = Decimal(1)
+    if cleaned[-1:].lower() == "k":
+        multiplier = Decimal(1_000)
+        cleaned = cleaned[:-1]
+    elif cleaned[-1:].lower() == "m":
+        multiplier = Decimal(1_000_000)
+        cleaned = cleaned[:-1]
     try:
-        return Decimal(cleaned)
+        return Decimal(cleaned) * multiplier
     except InvalidOperation:
         return None
 
