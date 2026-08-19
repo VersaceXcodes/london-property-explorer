@@ -66,15 +66,18 @@ Every default exists to keep this path frictionless: choropleth off (points are 
 
 ## 4. Layout
 
-The implemented desktop shell now follows the 2026-06-14 PropertyIQ-style reference:
+The implemented desktop shell follows the PropertyIQ-style reference:
 a persistent left navigation rail, a single-row search and filter toolbar, and a
 compact opportunity banner above the KPI strip. The toolbar keeps the real app
 controls visible in this order: London search, date range, Sales/Districts mode,
 location, property type, more filters, and notifications. The banner is not a
 landing page replacement; its CTAs open the grounded AI panel or scroll the existing
 live map into focus, and the real map remains directly below the header metrics.
+At intermediate laptop widths, lower-priority labels collapse before the toolbar can
+clip: the date control becomes `Dates`, location/property controls hide as needed,
+and More filters remains available as an icon command.
 
-### Desktop (≥ 768 px)
+### Desktop (> 900 px)
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
@@ -98,32 +101,45 @@ live map into focus, and the real map remains directly below the header metrics.
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-### Mobile (< 768 px)
+V2 is bounded by the visible map/viewport and owns vertical scrolling. Its form
+cannot widen the rail. Apply and Reset remain in a sticky bottom action row; Reset
+is never placed in the top-right close slot. The map has one top toolbar for mode,
+loaded count, and insights. AI insights live in V6 rather than in a floating map
+card. V5 is collapsed at bottom-right by default. A report draft appears only after
+one is created, can collapse to a compact pill, and stays bottom-right without
+covering V2.
+
+### Mobile (≤ 900 px)
 
 ```
-┌──────────────────────┐   V2 collapses to a ⚙ FAB (bottom-right) opening a
-│ ◤ Title (compact)    │   sheet with the same controls. V4 becomes a bottom
-│                      │   sheet: peek 35% → drag to 85%, swipe-down dismiss.
-│        MAP           │   V3 pill top-centre under the title. V5 legend
-│                      │   collapses to a tappable swatch strip. Hover doesn't
-│  [V3 pill]           │   exist: tap = select (tooltip step skipped).
-│ ┌V4 sheet ▔▔▔▔▔▔▔▔┐  │   Touch targets ≥ 44×44 px everywhere.
-│ │ 12 Maple Rd  ✕   │  │
-└─┴──────────────────┴──┘
+┌──────────────────────┐   V2 opens from the Filters command as a left drawer.
+│ ◤ Title    [filters] │   Its viewport-bounded content scrolls independently.
+│ [V3 toolbar]         │   V4 becomes a bottom sheet. V5 remains a collapsed
+│        MAP           │   bottom-right control until tapped. Hover does not
+│                      │   exist: tap selects. Touch targets are at least 44px.
+│          [V5 Legend] │
+└──────────────────────┘
 ```
 
-Breakpoints: 768 px (layout switch), 1280 px (V4 grows to 400 px). Map fills 100 dvh; UI is absolutely positioned over it.
+V2 opens from the Filters command as a fixed left drawer. Its height is
+`100dvh - 64px`, it scrolls internally, and it provides an explicit Close command.
+V5 remains collapsed at bottom-right until activated.
+
+Breakpoints: 900 px (drawer/single-column switch), 1280 px (compact toolbar), and
+1540 px (toolbar density). Fixed-format controls use stable dimensions and the map
+workspace remains free of horizontal overflow.
 
 ## 5. Component specs
 
 ### V2 Control panel
-- Sections: LAYERS (two toggle rows with switch control), TYPE (5 chips), TENURE (Freehold/Leasehold chips), PRICE (two numeric inputs), DATE (from/to inputs), Clear (text button, visible only when filters active).
+- Sections: PRICE (range and two numeric inputs), TYPE (5 chips), TENURE (Freehold/Leasehold chips), DATE (from/to inputs), radius/planning toggles, current selection, and saved searches.
+- Close is the only top-right command. Apply and Reset are sticky bottom actions and stay reachable while the form scrolls. Desktop height is constrained to the visible map/viewport; mobile height is `100dvh - 64px`. Horizontal overflow is prohibited.
 - Chip states: default (`--surface-2`, `--text-2`) · selected (`--accent` 18 % bg, `--accent` text+border) · pressed scale 0.97. No-selection = all property types / all tenures.
 - Price inputs commit on blur/Enter; values must be whole pounds in £0–£50,000,000 and min ≤ max. Date inputs must be real ISO dates with from ≤ to. Invalid input shows inline error styling and keeps the previous valid filters — never sends a bad request.
 - Choropleth row carries the permanent caption: "District medians · all sales" (FR-304).
 
 ### V3 Status pill
-Pill, bottom-centre, `--surface-1`, `--fs-sm`, content per the five states in `FRONTEND_VIEWS.md` §8. Count changes animate by text swap only — reserve enough width for `25,000+ loaded — zoom in`. Loading state prepends a 12 px spinner. Error state turns the border `--danger`.
+One top map toolbar combines the insights toggle with mode/count status. Count changes animate by text swap only; reserve enough width for `25,000+ loaded — zoom in`. Loading state prepends a 12 px spinner. Error state turns the border `--danger`.
 
 ### V4 Property card
 - Header: address line 1 (`--fs-lg`, weight 600), postcode + town (`--text-2`), ✕ top-right.
@@ -133,7 +149,9 @@ Pill, bottom-centre, `--surface-1`, `--fs-sm`, content per the five states in `F
 - Footnote (always): "Location shown is the postcode centroid." — honesty requirement (FR-604, DATA_MODEL §6).
 
 ### V5 Legend
-Horizontal swatch bar (5 cells of the ramp) with min/max edge labels and per-bin tooltips. Title states the active layer's metric: "Sale price (this view)" or "District median price". Updates with the topmost visible layer (`FRONTEND_VIEWS` §7).
+Bottom-right collapsed control by default. Activating it opens the colour-ramp,
+postcode-zone, and transport key above the control without occupying the centre of
+the map. It updates with the topmost visible layer (`FRONTEND_VIEWS` §7).
 
 ### Tooltip (hover, pointer devices only)
 Single floating div, `--surface-2`, radius-sm, `--fs-sm`, 8 px padding, positioned 12 px from cursor, flipping at viewport edges. Content: points → `£485,000 · Flat · Mar 2024`; clusters → `1,843 sales · median £612k`; districts → `SW11 · median £740k · 4,102 sales`. No animation (it must track at 60 fps — FR-207).
@@ -151,7 +169,9 @@ Single floating div, `--surface-2`, radius-sm, `--fs-sm`, 8 px padding, position
 - Conversation is session-only; no history affordance.
 
 ### Toast
-Bottom-right (desktop) / above sheet (mobile), `--surface-2` with `--danger` border for errors, auto-dismiss 6 s, max one visible, action slot ("Retry").
+Top-right beneath the app header, `--surface-2` with `--danger` border for errors,
+auto-dismiss 6 s, max one visible, action slot ("Retry"). This anchor is reserved
+for toasts; it does not share the report or legend corner.
 
 ## 6. Map & data styling
 

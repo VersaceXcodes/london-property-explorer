@@ -67,3 +67,72 @@ test('reviewer can stream an answer and apply a map proposal', async ({ page }) 
   await page.getByRole('button', { name: 'Undo' }).click();
   await expect(page.getByRole('button', { name: 'Districts' })).not.toHaveClass(/active/);
 });
+
+test('laptop layout keeps filters and map controls reachable', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'The laptop regression has an explicit desktop viewport.');
+  await page.setViewportSize({ width: 1200, height: 738 });
+  await page.goto('/');
+
+  const dateButton = page.getByRole('button', { name: /Date range:/ });
+  await expect(dateButton).toBeVisible();
+  await expect(dateButton).toContainText('Dates');
+  const dateBox = await dateButton.boundingBox();
+  expect(dateBox).not.toBeNull();
+  expect(dateBox!.x).toBeGreaterThanOrEqual(0);
+  expect(dateBox!.x + dateBox!.width).toBeLessThanOrEqual(1200);
+
+  await page.getByRole('button', { name: 'Explore the map' }).click();
+  await expect.poll(() => page.locator('.map-dashboard').evaluate((element) => element.scrollTop)).toBeGreaterThan(300);
+  const rail = page.locator('.control-rail');
+  await expect(rail).toBeVisible();
+  const railMetrics = await rail.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return {
+      bottom: rect.bottom,
+      clientHeight: element.clientHeight,
+      clientWidth: element.clientWidth,
+      scrollHeight: element.scrollHeight,
+      scrollWidth: element.scrollWidth,
+    };
+  });
+  expect(railMetrics.scrollHeight).toBeGreaterThan(railMetrics.clientHeight);
+  expect(railMetrics.scrollWidth).toBe(railMetrics.clientWidth);
+  expect(railMetrics.bottom).toBeLessThanOrEqual(738);
+
+  const applyButton = page.getByRole('button', { name: 'Apply filters' });
+  await expect(applyButton).toBeVisible();
+  const applyBox = await applyButton.boundingBox();
+  expect(applyBox).not.toBeNull();
+  expect(applyBox!.y + applyBox!.height).toBeLessThanOrEqual(railMetrics.bottom);
+
+  await rail.evaluate((element) => { element.scrollTop = element.scrollHeight; });
+  await expect(page.getByText('Current selection', { exact: true })).toBeVisible();
+  await expect(page.getByText('Saved searches', { exact: true })).toBeVisible();
+
+  await page.getByTitle('Close filters').click();
+  await expect(rail).not.toBeVisible();
+  await page.getByRole('button', { name: 'More filters' }).click();
+  await expect(rail).toBeVisible();
+
+  await expect(page.locator('.map-callout')).toHaveCount(0);
+  await expect(page.getByLabel('Map status and controls')).toBeVisible();
+  const legendButton = page.getByRole('button', { name: 'Legend' });
+  await expect(legendButton).toHaveAttribute('aria-expanded', 'false');
+  await expect(page.getByLabel('Price legend')).toHaveCount(0);
+  await legendButton.click();
+  await expect(page.getByLabel('Price legend')).toBeVisible();
+
+  await expect(page.getByLabel('Report drafts')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Draft report' }).click();
+  const reportDock = page.getByLabel('Report drafts');
+  await expect(reportDock).toBeVisible();
+  const reportBox = await reportDock.boundingBox();
+  expect(reportBox).not.toBeNull();
+  expect(reportBox!.x).toBeGreaterThan(600);
+  expect(reportBox!.y + reportBox!.height).toBeLessThanOrEqual(738);
+
+  const reportToggle = reportDock.getByRole('button', { name: /London report draft/ });
+  await reportToggle.click();
+  await expect(reportDock.getByRole('button', { name: 'Report draft', exact: true })).toHaveAttribute('aria-expanded', 'false');
+  await expect(reportDock.getByRole('button', { name: 'Export' })).toHaveCount(0);
+});

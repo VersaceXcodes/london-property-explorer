@@ -1,6 +1,6 @@
 # Project Progress
 
-**Last updated:** 2026-06-14
+**Last updated:** 2026-08-19
 **Current phase:** M4 deployed, performance tuning and durability evidence pending
 **Overall status:** Render frontend/API are live on Supabase PostGIS; live API smoke passes; Render point-query performance, 24-hour/7-day durability, Pinecone, LangSmith, and full live-eval release evidence remain pending
 
@@ -12,6 +12,7 @@
 - Implemented FastAPI lifecycle/configuration, repositories, services, uniform errors, cache/CORS/compression/logging middleware, data endpoints, capabilities, chat, SSE, and feedback.
 - Implemented and cross-checked the `LPE1` 8+23N binary format in Python and JavaScript.
 - Implemented the React first-screen map with MapLibre/OpenFreeMap, deck.gl binary attributes, a web worker, cancellation, debounce, stale-response rejection, bounded cache reuse, labelled clusters, points, lazy choropleth loading, filters, history, errors, mobile layouts, and fully restorative Apply/Undo behavior.
+- Corrected the laptop/mobile workspace layout: the filter rail is viewport-bounded and internally scrollable with sticky Apply/Reset actions and a dedicated Close command; the date command compacts before toolbar clipping; map mode/count/insights share one toolbar; the legend is collapsed bottom-right; map AI callouts moved into the Copilot rail; and the report draft is conditional, collapsible, and bottom-right.
 - Implemented a typed LangGraph workflow with SQL/RAG/hybrid/map/unsupported routes, strict SQL/map arguments, Claude structured output, Pinecone retrieval/rerank/outage fallback, mandatory evidence citations, two-pass numeric grounding, hard timeout/cost limits, redacted LangSmith traces, and human-reviewed feedback promotion.
 - Added configurable Claude-provider selection: Anthropic direct remains supported, and OpenRouter now works through an OpenAI-compatible LangChain gateway using `AI_PROVIDER=openrouter` plus server-side `OPENROUTER_API_KEY`.
 - Hardened the OpenRouter gateway for live Anthropic routing by using prompt-only JSON output plus local Pydantic validation, avoiding provider-side schema features that reject `oneOf`.
@@ -71,6 +72,7 @@
 | UI functionality smoke | Pass: Playwright CLI on `http://127.0.0.1:5174/` opened date/property menus, applied Terraced + Leasehold filters against real Supabase map data, opened `SW11 4NB` history with rendered sale rows, and reported 0 console errors. Three OpenFreeMap/deck warnings about null numeric tile values remain non-fatal. |
 | Map design smoke | Pass: in-app Browser refreshed `http://127.0.0.1:5174/`; final screenshot showed smaller readable cluster bubbles and updated overlays; browser logs reported 0 errors/warnings. |
 | Header redesign smoke | Pass: frontend ESLint, Vitest, production build, and Playwright e2e pass after the header refactor and aria-label correction. In-app Browser reload during the header update showed the new topbar/banner text, no horizontal overflow, and zero error/warning logs. |
+| Laptop/mobile layout regression | Pass: Browser at 1200x738 measured the rail at 626px client height vs 980px scroll height with no horizontal overflow (262px client/scroll width); wheel input reached Current selection and Saved searches while Apply/Reset stayed visible. At 390x844 the drawer measured 780px client height vs 1180px scroll height and wheel input reached both final sections. The date popover stayed inside the 1200px viewport, the report draft was absent until created and stayed bottom-right without covering the rail, and final Browser error/warning logs were empty. |
 | Render API smoke | Pass: `scripts/smoke.sh https://lpe-api-e7n7.onrender.com`; `/api/meta` returned 466,368 rows; CORS preflight from the live frontend origin passed; narrow binary endpoint returned valid `LPE1`. |
 | Render frontend smoke | Pass: `https://lpe-frontend-pss5.onrender.com` loads the app shell, real meta count, map clusters, and no browser console errors/warnings in the in-app Browser. |
 | Render measurements | Completed but over budget: five-run medians were clusters 0.571 s, points JSON 4.087 s, points binary 2.352 s. |

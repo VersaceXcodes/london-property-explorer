@@ -1,6 +1,6 @@
 import { GeoJsonLayer, ScatterplotLayer, TextLayer } from '@deck.gl/layers';
 import { MapboxOverlay } from '@deck.gl/mapbox';
-import { AlertCircle, Layers3, LoaderCircle, Sparkles } from 'lucide-react';
+import { AlertCircle, ChevronDown, Layers3, LoaderCircle, Sparkles } from 'lucide-react';
 import maplibregl from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -24,7 +24,7 @@ interface MapViewProps {
   stationRadiusEnabled: boolean;
   planningEnabled: boolean;
   onPostcodeSelect: (postcode: string) => void;
-  onViewMatchingAreas: () => void;
+  onInsightsToggle: () => void;
 }
 
 interface HoverInfo {
@@ -113,7 +113,7 @@ export function MapView({
   stationRadiusEnabled,
   planningEnabled,
   onPostcodeSelect,
-  onViewMatchingAreas,
+  onInsightsToggle,
 }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
@@ -130,6 +130,7 @@ export function MapView({
   const [error, setError] = useState<string | null>(null);
   const [districtError, setDistrictError] = useState<string | null>(null);
   const [hover, setHover] = useState<HoverInfo | null>(null);
+  const [legendOpen, setLegendOpen] = useState(false);
   const filtersKey = useMemo(() => JSON.stringify(filters), [filters]);
 
   const requestViewport = useCallback(async () => {
@@ -190,7 +191,7 @@ export function MapView({
     });
     const overlay = new MapboxOverlay({ interleaved: true, layers: [] });
     map.addControl(overlay as unknown as maplibregl.IControl);
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
     const schedule = () => {
       if (debounceRef.current !== null) window.clearTimeout(debounceRef.current);
       debounceRef.current = window.setTimeout(() => {
@@ -363,30 +364,30 @@ export function MapView({
   return (
     <section className="map-stage" aria-label="London property map">
       <div ref={containerRef} className="map-canvas" />
-      <div className="map-insights-toggle"><Sparkles size={15} /> Map insights <b>ON</b></div>
-      <div className="map-mode-badge">
-        {payload?.mode === 'points' ? 'Transactions' : 'Clusters'}
-        {' · '}
-        {payloadStatus(payload)}
+      <div className="map-toolbar" aria-label="Map status and controls">
+        <button className="map-insights-toggle" type="button" aria-pressed={planningEnabled} onClick={onInsightsToggle}><Sparkles size={15} /><span>Insights</span><b>{planningEnabled ? 'On' : 'Off'}</b></button>
+        <div className="map-mode-badge">
+          {payload?.mode === 'points' ? 'Transactions' : 'Clusters'}
+          {' · '}
+          {payloadStatus(payload)}
+        </div>
       </div>
       {loading && <div className="map-status"><LoaderCircle className="spin" size={16} /> Loading map data</div>}
       {error && <div className="map-status error"><AlertCircle size={16} /> {error}</div>}
       {choropleth && districtError && <div className="map-status error"><AlertCircle size={16} /> {districtError}</div>}
       {hover && <div className={`map-tooltip ${hover.tone ?? ''}`} style={{ left: hover.x + 12, top: hover.y + 12 }}><strong>{hover.title}</strong><span>{hover.detail}</span></div>}
-      {planningEnabled && (
-        <div className="map-callout">
-          <span><Sparkles size={14} /> AI insight</span>
-          <strong>Undervalued pocket detected in SE1 near Borough station</strong>
-          <button type="button" onClick={onViewMatchingAreas}>View matching areas</button>
-        </div>
-      )}
-      <div className="map-legend" aria-label="Price legend">
-        <div className="legend-title"><strong>Map legend</strong><Layers3 size={14} /></div>
-        <span><i className="cluster-dot" /> <b>Clustered sales</b><small>Bubble size shows transaction volume.</small></span>
-        <span><i className="zone-swatch" /> <b>Postcode zones</b><small>Selected districts and analysis areas.</small></span>
-        <span><i className="price-bands" /> <b>Price bands</b><small>Green under £400k, blue £400k-£800k, coral over £800k.</small></span>
-        {stationRadiusEnabled && <span><i className="station-dot" /> <b>Transport</b><small>Nearby rail and underground stations.</small></span>}
-        <small>Points from zoom {CLUSTER_ZOOM_THRESHOLD}</small>
+      <div className="map-legend-shell">
+        {legendOpen && (
+          <div id="map-legend-panel" className="map-legend" aria-label="Price legend">
+            <div className="legend-title"><strong>Map legend</strong><Layers3 size={14} /></div>
+            <span><i className="cluster-dot" /> <b>Clustered sales</b><small>Bubble size shows transaction volume.</small></span>
+            <span><i className="zone-swatch" /> <b>Postcode zones</b><small>Selected districts and analysis areas.</small></span>
+            <span><i className="price-bands" /> <b>Price bands</b><small>Green under £400k, blue £400k-£800k, coral over £800k.</small></span>
+            {stationRadiusEnabled && <span><i className="station-dot" /> <b>Transport</b><small>Nearby rail and underground stations.</small></span>}
+            <small>Points from zoom {CLUSTER_ZOOM_THRESHOLD}</small>
+          </div>
+        )}
+        <button className="map-legend-toggle" type="button" aria-controls="map-legend-panel" aria-expanded={legendOpen} onClick={() => setLegendOpen((open) => !open)}><Layers3 size={15} /><span>Legend</span><ChevronDown className={legendOpen ? 'expanded' : ''} size={14} /></button>
       </div>
       <footer className="source-strip">HM Land Registry Price Paid Data · OGL v3.0 · ONS postcode centroids · OGL v3.0</footer>
     </section>

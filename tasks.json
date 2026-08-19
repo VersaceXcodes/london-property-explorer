@@ -1,7 +1,7 @@
 {
   "project": "London Property Explorer",
   "version": "1.0.0",
-  "updated_at": "2026-06-14",
+  "updated_at": "2026-08-19",
   "status_values": [
     "pending",
     "in_progress",
@@ -322,7 +322,8 @@
         "2026-06-14: Playwright CLI smoke against real Supabase-backed localhost applied Terraced + Leasehold filters, opened SW11 4NB history with rendered rows, and reported zero console errors after adding an inline favicon.",
         "2026-06-14: Fixed the frontend schema to accept canonical HMLR GUIDs in transaction/history payloads; added regression coverage and verified the live history panel no longer shows a UUID validation error.",
         "2026-06-14: Improved map visual design with smaller cluster scaling, soft halos, fewer high-volume labels, tone-coded tooltips, refined choropleth strokes, updated legend marks, and glass/vignette map overlays. Frontend lint/build and Playwright e2e pass; in-app Browser screenshot reported zero logs.",
-        "2026-06-14: Updated the app header to the latest PropertyIQ-style reference with stacked logo, wider search/date/actions toolbar, separate Sales/Districts mode buttons, hero opportunity banner, real-data metadata, and functional Ask Property AI / Explore the map CTAs. Frontend ESLint, Vitest, production build, and Playwright e2e pass; Browser reload during the change showed the new header and zero error/warning logs before a final aria-label-only correction."
+        "2026-06-14: Updated the app header to the latest PropertyIQ-style reference with stacked logo, wider search/date/actions toolbar, separate Sales/Districts mode buttons, hero opportunity banner, real-data metadata, and functional Ask Property AI / Explore the map CTAs. Frontend ESLint, Vitest, production build, and Playwright e2e pass; Browser reload during the change showed the new header and zero error/warning logs before a final aria-label-only correction.",
+        "2026-08-19: Fixed the laptop filter rail and overlay composition. In-app Browser at 1200x738 measured the open rail at clientHeight 626, scrollHeight 980, and clientWidth=scrollWidth=262; wheel input reached Current selection and Saved searches while sticky Apply/Reset remained visible. At 390x844, the mobile drawer measured clientHeight 780 and scrollHeight 1180, and wheel input reached the final sections. The date command compacts without clipping, the map uses one toolbar and a collapsed bottom-right legend, and the conditional collapsible report draft stays bottom-right without covering filters. Frontend ESLint, Vitest (6 tests), production build, and Playwright e2e pass; final Browser error/warning logs were empty."
       ],
           "files": [
             "frontend/src/components",

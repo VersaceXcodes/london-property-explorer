@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import { Building, Building2, ChevronDown, CircleHelp, Home, House, RotateCcw, Warehouse } from 'lucide-react';
+import { Building, Building2, ChevronDown, CircleHelp, Home, House, RotateCcw, Warehouse, X } from 'lucide-react';
 
 import { EMPTY_FILTERS, PROPERTY_TYPE_LABELS, PROPERTY_TYPES, TENURE_LABELS, TENURES } from '@schema';
 
@@ -13,6 +13,7 @@ interface FilterPanelProps {
   onStationRadiusChange: (enabled: boolean) => void;
   onPlanningChange: (enabled: boolean) => void;
   onApply: () => void;
+  onClose: () => void;
 }
 
 const typeIcons: Record<PropertyType, ComponentType<{ size?: number; strokeWidth?: number }>> = {
@@ -37,6 +38,7 @@ export function FilterPanel({
   onStationRadiusChange,
   onPlanningChange,
   onApply,
+  onClose,
 }: FilterPanelProps) {
   const setNumber = (field: 'min_price' | 'max_price', value: string) => {
     onChange({ ...filters, [field]: value === '' ? null : Number(value) });
@@ -55,8 +57,8 @@ export function FilterPanel({
     <section className="control-section filter-panel" aria-labelledby="filter-heading">
       <div className="section-heading">
         <h2 id="filter-heading">Filters</h2>
-        <button className="text-button" type="button" title="Reset filters" onClick={() => onChange({ ...EMPTY_FILTERS })}>
-          Reset <RotateCcw size={14} />
+        <button className="icon-button filter-close" type="button" title="Close filters" aria-label="Close filters" onClick={onClose}>
+          <X size={16} />
         </button>
       </div>
 
@@ -129,7 +131,9 @@ export function FilterPanel({
 
       <div className="filter-actions">
         <button className="primary-action" type="button" onClick={onApply}>Apply filters</button>
-        <span>Live results</span>
+        <button className="secondary-action" type="button" onClick={() => onChange({ ...EMPTY_FILTERS })}>
+          <RotateCcw size={14} /> Reset
+        </button>
       </div>
     </section>
   );

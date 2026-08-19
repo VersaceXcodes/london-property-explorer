@@ -158,7 +158,7 @@ export default function App() {
   const [activeView, setActiveView] = useState('Map');
   const [chatOpen, setChatOpen] = useState(true);
   const [chatFocusSignal, setChatFocusSignal] = useState(0);
-  const [controlsOpen, setControlsOpen] = useState(false);
+  const [controlsOpen, setControlsOpen] = useState(() => window.innerWidth > 900);
   const [stationRadiusEnabled, setStationRadiusEnabled] = useState(true);
   const [planningEnabled, setPlanningEnabled] = useState(true);
   const [undoState, setUndoState] = useState<ExplorerState | null>(null);
@@ -169,7 +169,8 @@ export default function App() {
   const [locationLabel, setLocationLabel] = useState('London');
   const [toast, setToast] = useState<Toast | null>(null);
   const [savedSearches, setSavedSearches] = useState<string[]>(['London all sales']);
-  const [reports, setReports] = useState<string[]>(['London Area Report draft']);
+  const [reports, setReports] = useState<string[]>([]);
+  const [reportExpanded, setReportExpanded] = useState(false);
   const [automations, setAutomations] = useState(['Weekly borough scan', 'Planning alert monitor']);
   const [notifications, setNotifications] = useState([
     'OpenRouter SQL chat enabled',
@@ -315,11 +316,12 @@ export default function App() {
   const createReport = () => {
     const label = `${locationLabel} report draft`;
     setReports((current) => [label, ...current.filter((item) => item !== label)].slice(0, 5));
+    setReportExpanded(true);
     showToast('Report draft created', label, 'success');
   };
   const exploreMap = () => {
     setActiveView('Map');
-    setControlsOpen(false);
+    setControlsOpen(window.innerWidth > 900);
     const workspace = dashboardRef.current?.querySelector<HTMLElement>('.workspace');
     dashboardRef.current?.scrollTo({ top: workspace?.offsetTop ?? 0, behavior: 'smooth' });
     showToast('Live map in focus', 'Supabase-backed sales data remains loaded locally.', 'info');
@@ -361,10 +363,10 @@ export default function App() {
             <input aria-label="Search addresses, postcodes, stations, areas" placeholder="Search London addresses, postcodes, stations, areas..." value={searchValue} onChange={(event) => setSearchValue(event.target.value)} />
           </form>
           <div className="toolbar-actions">
-            <button className="toolbar-pill date-pill" type="button" onClick={() => setOpenMenu(openMenu === 'date' ? null : 'date')}><CalendarDays size={17} /> {dateLabel} <ChevronDown size={15} /></button>
+            <button className="toolbar-pill date-pill" type="button" aria-label={`Date range: ${dateLabel}`} onClick={() => setOpenMenu(openMenu === 'date' ? null : 'date')}><CalendarDays size={17} /><span className="date-full">{dateLabel}</span><span className="date-short" aria-hidden="true">Dates</span><ChevronDown size={15} /></button>
             <button className={!choropleth ? 'mode-pill active' : 'mode-pill'} type="button" aria-pressed={!choropleth} onClick={() => setChoropleth(false)}><BarChart3 size={16} /> Sales</button>
             <button className={choropleth ? 'mode-pill active' : 'mode-pill'} type="button" aria-pressed={choropleth} onClick={() => setChoropleth(true)}><Layers3 size={16} /> Districts</button>
-            <button className="toolbar-pill hide-sm" type="button" onClick={() => setOpenMenu(openMenu === 'location' ? null : 'location')}>{locationLabel} <ChevronDown size={15} /></button>
+            <button className="toolbar-pill location-pill hide-sm" type="button" onClick={() => setOpenMenu(openMenu === 'location' ? null : 'location')}>{locationLabel} <ChevronDown size={15} /></button>
             <button className="toolbar-pill hide-md" type="button" onClick={() => setOpenMenu(openMenu === 'property' ? null : 'property')}>{propertyLabel(filters.types)} <ChevronDown size={15} /></button>
             {undoState && <button className="toolbar-pill" type="button" title="Undo map change" onClick={undo}><Undo2 size={16} /> Undo</button>}
             <button className="toolbar-pill mobile-controls" type="button" title="Open filters" onClick={() => setControlsOpen((value) => !value)}><PanelLeft size={16} /> Filters</button>
@@ -430,6 +432,7 @@ export default function App() {
                 onStationRadiusChange={(enabled) => { setStationRadiusEnabled(enabled); showToast('Transport overlay updated', enabled ? 'Nearby transport context is visible.' : 'Transport context hidden.', 'info'); }}
                 onPlanningChange={(enabled) => { setPlanningEnabled(enabled); showToast('Planning overlay updated', enabled ? 'Planning insight overlay is visible.' : 'Planning insight overlay hidden.', 'info'); }}
                 onApply={() => { setControlsOpen(false); showToast('Filters applied', `${propertyLabel(filters.types)} · ${filters.tenures?.join(',') ?? 'All tenures'}`, 'success'); }}
+                onClose={() => setControlsOpen(false)}
               />
               <section className="control-section data-note">
                 <span>Current selection</span>
@@ -454,7 +457,7 @@ export default function App() {
                 stationRadiusEnabled={stationRadiusEnabled}
                 planningEnabled={planningEnabled}
                 onPostcodeSelect={selectPostcode}
-                onViewMatchingAreas={() => highlightDistrict('SE1', 'Viewing matching SE1 areas')}
+                onInsightsToggle={() => { setPlanningEnabled((enabled) => !enabled); showToast('Map insights updated', planningEnabled ? 'Map insights hidden.' : 'Map insights visible in the AI rail.', 'info'); }}
               />
               <section className="insight-grid" aria-label="Map analytics">
                 <article className="analytics-card wide">
@@ -489,7 +492,16 @@ export default function App() {
           </div>
 
           {selectedPostcode && <HistoryPanel key={selectedPostcode} postcode={selectedPostcode} onClose={() => setSelectedPostcode(null)} />}
-          {reports.length > 0 && <div className="report-dock" aria-label="Report drafts"><ClipboardList size={15} />{reports[0]}<button type="button" onClick={() => showToast('Export prepared', 'Report export is a local draft until Render deployment is connected.', 'info')}><Download size={14} /> Export</button></div>}
+          {reports.length > 0 && (
+            <aside className={reportExpanded ? 'report-dock expanded' : 'report-dock'} aria-label="Report drafts">
+              <button className="report-dock-toggle" type="button" aria-expanded={reportExpanded} onClick={() => setReportExpanded((expanded) => !expanded)}>
+                <ClipboardList size={15} />
+                <span>{reportExpanded ? reports[0] : 'Report draft'}</span>
+                <ChevronDown className={reportExpanded ? 'expanded' : ''} size={14} />
+              </button>
+              {reportExpanded && <button className="report-export" type="button" onClick={() => showToast('Export prepared', 'Report export is a local draft until Render deployment is connected.', 'info')}><Download size={14} /> Export</button>}
+            </aside>
+          )}
           {toast && <div key={toast.id} className={`toast ${toast.kind}`} role="status"><strong>{toast.title}</strong>{toast.detail && <span>{toast.detail}</span>}<button type="button" title="Dismiss" onClick={() => setToast(null)}><X size={14} /></button></div>}
         </section>
       </main>
