@@ -78,7 +78,8 @@
           "evidence": [
             "Python editable install completed.",
             "Frontend npm install and production build completed on Node 22.16.",
-            "PR and protected live workflows created."
+            "PR and protected live workflows created.",
+            "2026-08-19: Removed the npm audit high-severity gate from the frontend CI job by explicit request; lint, unit tests, production build, and Playwright remain required. A same-day manual audit reported five high-severity transitive dependency findings."
           ],
           "files": [
             "pyproject.toml",
