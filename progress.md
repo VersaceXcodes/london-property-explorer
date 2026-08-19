@@ -56,7 +56,7 @@
 | `ruff format --check` and `ruff check` | Pass |
 | `mypy api pipeline evals scripts` | Pass, 67 source files |
 | `pytest -q` | 39 passed, 1 protected live test skipped |
-| `npm audit --audit-level=high` | Removed from push/PR CI by explicit request on 2026-08-19. Manual audit reported 5 high-severity transitive dependency findings; lint, unit tests, build, and Playwright remain CI gates. |
+| Frontend CI scope | `npm audit`, Playwright browser installation, and `npm run e2e` were removed from push/PR CI by explicit request on 2026-08-19. Manual audit reported 5 high-severity transitive dependency findings. Lint, unit tests, and production build remain CI gates; Playwright remains available locally. |
 | Frontend ESLint | Pass |
 | Vitest | 6 tests passed |
 | Production frontend build | Pass; 573 KB gzip main bundle warning remains for M4 measurement/code-splitting |
